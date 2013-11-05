@@ -81,6 +81,7 @@
             
             promise = uploadOperation.startAsync().then(
                 function () {
+                    uploading = false;
                     // complete
                     var responseInformation = uploadOperation.getResponseInformation();
 
@@ -110,6 +111,7 @@
                     }
                 },
                 function () {
+                    uploading = false;
                     // error
                     document.getElementById("progress").innerText = WinJS.Resources.getString('failed to upload').value;
                 }
