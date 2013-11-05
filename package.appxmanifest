@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="442666080FC00.YabumiUploader" Version="1.1.0.2" Publisher="CN=2383AF17-10A3-447D-B221-23DE7A5711FE" />
+  <Identity Name="442666080FC00.YabumiUploader" Version="1.1.0.4" Publisher="CN=2383AF17-10A3-447D-B221-23DE7A5711FE" />
   <Properties>
     <DisplayName>Yabumi Uploader</DisplayName>
     <PublisherDisplayName>Yuki KAN / Webnium</PublisherDisplayName>
@@ -20,9 +20,13 @@
         <Extension Category="windows.shareTarget" StartPage="target.html">
           <ShareTarget>
             <SupportedFileTypes>
-              <SupportsAnyFileType />
+              <FileType>.jpg</FileType>
+              <FileType>.jpeg</FileType>
+              <FileType>.png</FileType>
+              <FileType>.gif</FileType>
+              <FileType>.svg</FileType>
+              <FileType>.pdf</FileType>
             </SupportedFileTypes>
-            <DataFormat>bitmap</DataFormat>
           </ShareTarget>
         </Extension>
       </Extensions>

@@ -1,14 +1,7 @@
 ﻿(function () {
     'use strict';
 
-    var uploadOperation = null;
-
     var file = null;
-    var data = null;
-    var base64 = null;
-    var canvas = null;
-    var ctx = null;
-    var promise = null;
     var uploading = false;
 
     function backToTop() {
@@ -20,39 +13,22 @@
         file = null;
     }
 
-    function preview() {
-        file.openAsync(Windows.Storage.FileAccessMode.read).then(function (readStream) {
-            var size = readStream.size;
-            var maxuint32 = 4294967295;
-
-            if (size <= maxuint32) {
-                var dataReader = new Windows.Storage.Streams.DataReader(readStream);
-                dataReader.loadAsync(size).then(function () {
-                    var b = data = dataReader.readBuffer(size);
-                    base64 = Windows.Security.Cryptography.CryptographicBuffer.encodeToBase64String(b);
-
-                    dataReader.close();
-
-                    document.getElementById("imageHolder").src = 'data:image;base64,' + base64;
-                    document.getElementById("imageArea").className = '';
-
-                    document.getElementById("upload").innerText = WinJS.Resources.getString('upload').value + ' (' + Math.round(size / 1024) + 'KB)';
-                });
-            }
-        });
+    function preview(readStream) {
+        document.getElementById("imageHolder").src = URL.createObjectURL(readStream, { oneTimeOnly: true });
+        document.getElementById("imageArea").className = '';
     }
 
     function confirm() {
         document.getElementById('top').className = 'hidden';
         document.getElementById('uploader').className = '';
 
-        if (['.jpg', '.jpeg', '.png', '.gif', '.bmp'].indexOf(file.fileType) !== -1) {
-            preview();
-        } else {
-            file.openAsync(Windows.Storage.FileAccessMode.read).then(function (readStream) {
-                document.getElementById("upload").innerText = WinJS.Resources.getString('upload').value + ' (' + Math.round(readStream.size / 1024) + 'KB)';
-            });
-        }
+        file.openReadAsync().then(function (readStream) {
+            if (['.jpg', '.jpeg', '.png', '.gif', '.bmp'].indexOf(file.fileType) !== -1) {
+                preview(readStream);
+            }
+
+            document.getElementById("upload").innerText = WinJS.Resources.getString('upload').value + ' (' + Math.round(readStream.size / 1024) + 'KB)';
+        });
     }
 
     function uploadRequest() {
@@ -64,7 +40,7 @@
 
         document.getElementById('upload').innerText = WinJS.Resources.getString('uploading').value + '...';
         
-        var api = new Windows.Foundation.Uri('https://direct.yabumi.cc/api/image.txt');
+        var api = new Windows.Foundation.Uri('https://direct.yabumi.cc/api/images.txt');
         var uploader = new Windows.Networking.BackgroundTransfer.BackgroundUploader();
 
         uploader.setRequestHeader('user-agent', 'YabumiUploaderForWindows/1.0');
@@ -76,25 +52,24 @@
 
         contentParts.push(part);
 
-        uploader.createUploadAsync(api, contentParts).then(function (upload) {
-            uploadOperation = upload;
-            
-            promise = uploadOperation.startAsync().then(
+        uploader.createUploadAsync(api, contentParts).then(function (uploadOperation) {
+            uploadOperation.startAsync().then(
                 function () {
+                    uploading = false;
                     // complete
                     var responseInformation = uploadOperation.getResponseInformation();
 
                     var headers = responseInformation.headers;
                     var statusCode = responseInformation.statusCode;
 
-                    if (statusCode === 200) {
+                    if (statusCode === 200 || statusCode === 201) {
                         // OK
                         document.getElementById("upload").innerText = WinJS.Resources.getString('done').value;
-                        document.getElementById("progress").innerText = headers['X-Yabumi-Image-Url'];
+                        document.getElementById("progress").innerText = headers['Location'];
 
                         if (document.getElementById("isEnableCopyURI").checked) {
                             var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
-                            dataPackage.setText(headers['X-Yabumi-Image-Url']);
+                            dataPackage.setText(headers['Location']);
                             Windows.ApplicationModel.DataTransfer.Clipboard.setContent(dataPackage);
                         }
 
@@ -110,6 +85,7 @@
                     }
                 },
                 function () {
+                    uploading = false;
                     // error
                     document.getElementById("progress").innerText = WinJS.Resources.getString('failed to upload').value;
                 }
@@ -118,15 +94,12 @@
     }
 
     function pickAImage() {
-        // Create the picker object and set options
         var openPicker = new Windows.Storage.Pickers.FileOpenPicker();
         openPicker.viewMode = Windows.Storage.Pickers.PickerViewMode.thumbnail;
         openPicker.suggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.picturesLibrary;
-        // Users expect to have a filtered view of their folders depending on the scenario.
-        // For example, when choosing a documents folder, restrict the filetypes to documents for your application.
+
         openPicker.fileTypeFilter.replaceAll([".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg", ".pdf"]);
 
-        // Open the picker for the user to pick a file
         openPicker.pickSingleFileAsync().then(function (a) {
             if (a) {
                 file = a;

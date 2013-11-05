@@ -1,13 +1,7 @@
 ﻿(function () {
     var shareOperation = null;
-    var uploadOperation = null;
 
     var file = null;
-    var data = null;
-    var base64 = null;
-    var canvas = null;
-    var ctx = null;
-    var promise = null;
 
     function activatedHandler(eventObject) {
         if (eventObject.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.shareTarget) {
@@ -20,33 +14,24 @@
     }
 
     function shareReady(eventArgs) {
-        canvas = document.getElementById('canvas');
-        ctx = canvas.getContext('2d');
-
         if (shareOperation.data.contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.storageItems)) {
             shareOperation.data.getStorageItemsAsync().then(function (storageItems) {
                 file = storageItems.getAt(0);
 
-                file.openAsync(Windows.Storage.FileAccessMode.read).then(function (readStream) {
-                    var size = readStream.size;
-                    var maxuint32 = 4294967295;
-
-                    if (size <= maxuint32) {
-                        var dataReader = new Windows.Storage.Streams.DataReader(readStream);
-                        dataReader.loadAsync(size).then(function () {
-                            var b = data = dataReader.readBuffer(size);
-                            base64 = Windows.Security.Cryptography.CryptographicBuffer.encodeToBase64String(b);
-
-                            dataReader.close();
-
-                            document.getElementById("imageHolder").src = 'data:image;base64,' + base64;
+                try {
+                    file.openReadAsync().then(function (readStream) {
+                        if (['.jpg', '.jpeg', '.png', '.gif', '.bmp'].indexOf(file.fileType) !== -1) {
+                            document.getElementById("imageHolder").src = URL.createObjectURL(readStream, { oneTimeOnly: true });
                             document.getElementById("imageArea").className = '';
+                        }
 
-                            initialize();
-                            document.getElementById("upload").innerText = WinJS.Resources.getString('upload').value + ' (' + Math.round(size / 1024) + 'KB)';
-                        });
-                    }
-                });
+                        initialize();
+                        document.getElementById("upload").innerText = WinJS.Resources.getString('upload').value + ' (' + Math.round(readStream.size / 1024) + 'KB)';
+                    });
+                } catch (e) {
+                    initialize();
+                    document.getElementById("upload").innerText = WinJS.Resources.getString('upload').value;
+                }
             });
         }
     }
@@ -61,7 +46,7 @@
         document.getElementById('upload').removeEventListener('click', uploadRequest);
         document.getElementById('upload').innerText = WinJS.Resources.getString('uploading').value + '...';
         
-        var api = new Windows.Foundation.Uri('https://direct.yabumi.cc/api/image.txt');
+        var api = new Windows.Foundation.Uri('https://direct.yabumi.cc/api/images.txt');
         var uploader = new Windows.Networking.BackgroundTransfer.BackgroundUploader();
 
         uploader.setRequestHeader('user-agent', 'YabumiUploaderForWindows/1.0');
@@ -73,10 +58,8 @@
 
         contentParts.push(part);
 
-        uploader.createUploadAsync(api, contentParts).then(function (upload) {
-            uploadOperation = upload;
-            
-            promise = uploadOperation.startAsync().then(
+        uploader.createUploadAsync(api, contentParts).then(function (uploadOperation) {
+            uploadOperation.startAsync().then(
                 function () {
                     // complete
                     var responseInformation = uploadOperation.getResponseInformation();
@@ -84,14 +67,14 @@
                     var headers = responseInformation.headers;
                     var statusCode = responseInformation.statusCode;
 
-                    if (statusCode === 200) {
+                    if (statusCode === 200 || statusCode === 201) {
                         // OK
                         document.getElementById("upload").innerText = WinJS.Resources.getString('done').value;
-                        document.getElementById("progress").innerText = headers['X-Yabumi-Image-Url'];
+                        document.getElementById("progress").innerText = headers['Location'];
 
                         if (document.getElementById("isEnableCopyURI").checked) {
                             var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
-                            dataPackage.setText(headers['X-Yabumi-Image-Url']);
+                            dataPackage.setText(headers['Location']);
                             Windows.ApplicationModel.DataTransfer.Clipboard.setContent(dataPackage);
                         }
 
