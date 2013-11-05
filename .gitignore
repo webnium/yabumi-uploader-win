@@ -1,0 +1,15 @@
+.DS_Store
+*.db
+Debug/
+Release/
+Output/
+bld/
+bin/
+BundleArtifacts/
+*_Test
+*.aps
+*.suo
+*.jsproj.user
+*.zip
+*.pfx
+*.appxupload

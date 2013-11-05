@@ -1,0 +1,19 @@
+﻿{
+    "preview": "Preview",
+	"behavior of after upload": "Behavior of after upload",
+	"copy the url to the clipboard": "Copy the URL to the clipboard",
+	"open the edit page": "Open the edit page",
+	"upload": "UPLOAD",
+	"uploading": "UPLOADING",
+	"done": "DONE",
+	"failed to upload": "Failed to upload",
+	"or": "Or",
+	"privacy": "Privacy",
+	
+	"default-yabumi-introduction": "Share image from",
+	"default-pick-a-image": "Pick a existing picture",
+	"default-take-a-photo": "Take a photo",
+	"default-share-charm-anywhere": "Share the screenshot using \"share charm\" on any screen",
+	"default-share-charm-picture": "Share the image using \"share charm\" on picture app",
+	"note-ssl-secure": "Communication is absolutely encrypted by SSL."
+}

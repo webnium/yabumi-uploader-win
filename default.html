@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Yabumi Uploader</title>
+
+    <!-- WinJS references -->
+    <link rel="stylesheet" href="//Microsoft.WinJS.2.0/css/ui-light.css" />
+    <script src="//Microsoft.WinJS.2.0/js/base.js"></script>
+    <script src="//Microsoft.WinJS.2.0/js/ui.js"></script>
+
+    <!-- App references -->
+    <link rel="stylesheet" href="/css/basic.css" />
+    <script src="/js/default.js"></script>
+</head>
+<body class="default">
+    <div id="root">
+        <div id="header" data-win-control="WinJS.UI.HtmlControl" data-win-options="{uri: '/header.html'}"></div>
+        <div id="content">
+            <div id="top">
+                <p><span data-win-res="{textContent: 'default-yabumi-introduction'}"></span>:</p>
+                <button id="take-a-photo" data-win-res="{textContent: 'default-take-a-photo'}"></button>
+                <button id="pick-a-image" data-win-res="{textContent: 'default-pick-a-image'}"></button>
+                <p><span data-win-res="{textContent: 'or'}"></span>:</p>
+                <button data-win-res="{textContent: 'default-share-charm-anywhere'}" disabled></button>
+                <button data-win-res="{textContent: 'default-share-charm-picture'}" disabled></button>
+            </div>
+            <div class="hidden" id="uploader">
+                <p>
+                    <button class="win-backbutton" id="back-to-top" aria-label="Back"></button>
+                </p>
+
+                <div id="imageArea" class="hidden">
+                    <p>
+                        <strong><span data-win-res="{textContent: 'preview'}"></span>:</strong>
+                    </p>
+                    <img alt="preview" id="imageHolder" />
+                </div>
+
+                <p>
+                    <span data-win-res="{textContent: 'behavior of after upload'}"></span>:
+                </p>
+
+                <div>
+                    <label>
+                        <input type="checkbox" id="isEnableCopyURI" value="isEnableCopyURI" checked /><span data-win-res="{textContent: 'copy the url to the clipboard'}"></span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="isEnableOpenURI" value="isEnableOpenURI" checked /><span data-win-res="{textContent: 'open the edit page'}"></span>
+                    </label>
+                </div>
+
+                <p class="note-ssl-secure" data-win-res="{textContent: 'note-ssl-secure'}"></p>
+
+                <button id="upload">...</button>
+
+                <p id="progress"></p>
+
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+        <div id="footer" data-win-control="WinJS.UI.HtmlControl" data-win-options="{uri: '/footer.html'}"></div>
+    </div>
+</body>
+</html>

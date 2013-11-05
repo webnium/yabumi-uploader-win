@@ -1,0 +1,19 @@
+﻿{
+    "preview": "プレビュー",
+	"behavior of after upload": "アップロード後の挙動",
+	"copy the url to the clipboard": "クリップボードにURLをコピー",
+	"open the edit page": "編集画面を開く",
+	"upload": "アップロード",
+	"uploading": "アップロードしています",
+	"done": "完了",
+	"failed to upload": "アップロードに失敗しました",
+	"or": "または",
+	"privacy": "プライバシー",
+
+	"default-yabumi-introduction": "Yabumiを使うと一瞬で写真やスクリーンショットなどを誰かに共有できます",
+	"default-pick-a-image": "既存の画像を選択",
+	"default-take-a-photo": "写真を撮影",
+	"default-share-charm-anywhere": "すべての画面上の「共有チャーム」からスクリーンショットを共有できます",
+	"default-share-charm-picture": "写真アプリ等での「共有チャーム」から表示中の画像を共有できます",
+	"note-ssl-secure": "通信は完全にSSLで暗号化されます"
+}

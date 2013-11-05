@@ -1,0 +1,134 @@
+﻿.hidden { display:none; }
+.unhidden {  visibility:visible; }
+
+.thumbnail {
+    max-height: 48px;
+    max-width: 48px;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    color: #777;
+    overflow: hidden;
+}
+
+body.target {
+    border-top: 2px solid #9caeb7;
+}
+
+    body > div#root {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+
+        body > div#root > div#header {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            padding: 20px;
+        }
+
+        body > div#root > div#content {
+            position: absolute;
+            top: 58px;
+            right: 0;
+            bottom: 56px;
+            left: 0;
+            padding: 20px 40px;
+            overflow: auto;
+        }
+
+        body.target > div#root > div#content {
+            top: 0;
+            padding-top: 0;
+        }
+
+        body > div#root > div#footer {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            padding: 20px;
+            font-size: 12px;
+            background: #9caeb7;
+            color: #fff;
+        }
+
+            body > div#root > div#footer a {
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            body > div#root > div#footer > .links {
+                float: right;
+            }
+
+    div#top button {
+        display: block;
+        width: 400px;
+        margin-bottom: 10px;
+        padding: 10px;
+        background: #9caeb7;
+        color: #fff;
+        text-align: left;
+    }
+
+        div#top button:disabled {
+            background: #eee;
+            color: #777;
+            font-weight: normal;
+            font-size: 12px;
+            border-width: 1px;
+        }
+
+    button#upload {
+        background: #9caeb7;
+        color: #fff;
+	    float:right;
+    }
+
+    body.default button#upload {
+	    float: left;
+    }
+
+img#imageHolder {
+    max-width: 100%;
+    border: 2px solid #9caeb7;
+}
+
+body.default img#imageHolder {
+    max-width: 35%;
+}
+
+input {
+    margin-right: 20px;
+}
+
+canvas {
+    display: none;
+}
+
+svg.logo {
+
+    width : 100px;
+    height: 31px;
+    fill: #9caeb7;
+}
+
+span.prod {
+    font-size: 15px;
+    color: #777;
+    line-height: 31px;
+    vertical-align: 2px;
+}
+
+p.note-ssl-secure {
+    color: #f39700;
+    font-size: 12px;
+}
