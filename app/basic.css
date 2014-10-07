@@ -1,0 +1,429 @@
+﻿.hidden { display:none; }
+.unhidden {  visibility:visible; }
+
+body {
+    padding: 0;
+    margin: 0;
+    color: #777;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+body.default {
+    background-color: #f7f7f7;
+}
+
+body > img.logo {
+    z-index: -1;
+    position: fixed;
+    top: -240px;
+    left: -210px;
+    width: 600px;
+    height: 600px;
+    opacity: 0.5;
+}
+
+progress.win-ring {
+    color: #ec6d51;
+}
+
+div.mask {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(255,255,255,0.5);
+    z-index: 2000;
+}
+
+    div.mask > progress {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        margin-top: -20px;
+        margin-left: -20px;
+    }
+
+body.upload > div.mask {
+    background-color: rgba(0,0,0,0.8);
+}
+
+div#app-bar {
+    background: rgba(236,109,81,0.9);
+}
+
+body.upload > div#app-bar {
+    background: rgba(0,0,0,0.95);
+}
+
+body.viewer > div#app-bar {
+    background: rgba(255,255,255,0.8);
+}
+
+body.viewer > div#top-app-bar {
+    background: transparent;
+    padding-top: 45px;
+    padding-left: 10px;
+}
+
+    body.viewer > div#app-bar > button > span,
+    body.viewer > div#top-app-bar > button > span {
+        color: #ec6d51;
+        border-color: #ec6d51;
+    }
+
+        body.viewer > div#app-bar > button > span > span,
+        body.viewer > div#top-app-bar > button > span > span {
+            color: #ec6d51;
+        }
+
+div#preview {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+    div#preview > progress {
+        width: 100%;
+        color: #fff;
+    }
+
+    div#preview > div {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: contain;
+    }
+
+    div#preview > h3 {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        left: 0;
+        margin-top: -15px;
+        color: #555;
+        text-align: center;
+        top: 50%;
+        font-size: 30px;
+        font-weight: normal;
+        line-height: 30px;
+    }
+
+canvas {
+    display: none;
+}
+
+div.image-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    overflow: auto;
+    font-size: 0;
+    -ms-touch-action: none;
+}
+
+    div.image-container > div.flagrate-progress {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        transition: opacity 0.25s ease;
+    }
+
+        div.image-container > div.flagrate-progress > div {
+            background-color: #ec6d51;
+        }
+
+    div.image-container > img.image {
+        -ms-user-select: none;
+        -ms-touch-action: none;
+        transition: opacity 0.25s ease;
+    }
+
+    div.image-container > img.image.hide {
+        opacity: 0;
+    }
+
+    div.image-container > img.image.resizable {
+        /* cursor: zoom-out; */
+    }
+
+    div.image-container > img.image.resizable.fit {
+        /* cursor: zoom-in; */
+        max-width: 100% !important;
+    }
+
+    div.image-container > img.image.resizable.fit.fit-vertically {
+        max-height: 100% !important;
+        height: 100% !important;
+    }
+
+    div.image-container > iframe.pdf {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+div.info-container {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    font-size: 13px;
+    padding: 0 15px;
+    height: 0;
+    overflow: hidden;
+    opacity: 0.5;
+    transition: all 0.5s ease;
+    -ms-user-select: none;
+}
+
+div.info-container.visible {
+    padding: 10px 15px;
+    height: 360px;
+    overflow: auto;
+    opacity: 1;
+    -ms-user-select: text;
+}
+
+    div.info-container > button.remove {
+        z-index: 1;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        line-height: 20px;
+        width: 20px;
+        height: 20px;
+        color: #ccc;
+        font-weight: normal;
+        font-family: 'Segoe UI Symbol';
+    }
+
+    div.info-container > button.remove:hover {
+        color: #fff;
+    }
+
+    div.info-container > button.remove::before {
+        content: '\E17E';
+    }
+
+    div.info-container > button.remove::after {
+        content: '\E10A';
+    }
+
+    div.info-container > form {
+        background-color: transparent;
+    }
+
+        div.info-container > form > div {
+            border: none;
+        }
+
+        div.info-container > form > div.via {
+            color: rgba(255,255,255,0.25);
+        }
+
+            div.info-container > form > div.via > div,
+            div.info-container > form > div.via > div > p {
+                font-size: 10px;
+            }
+
+    div.info-container > span {
+        margin-left: 5px;
+    }
+
+    div.info-container > span:first-child {
+        margin-left: 0;
+    }
+
+div#header {
+    position: relative;
+}
+
+    div#header > img.logo {
+        position: absolute;
+        top: 55px;
+        left: 40px;
+        width: 42px;
+        height: 42px;
+    }
+
+    div#header > h1 {
+        position: absolute;
+        top: 55px;
+        left: 120px;
+        font-size: 42px;
+        line-height: 42px;
+        color: #2b2b2b;
+    }
+
+div#images-container {
+    margin: 120px;
+    padding: 30px 0;
+}
+
+    div#images-container > div {
+        line-height: 0;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+        div#images-container > div > div {
+            position: relative;
+            display: inline-block;
+            background-color: #e7e7e7;
+            margin-left: 10px;
+        }
+
+        div#images-container > div > div:first-child {
+            margin-left: 0;
+        }
+
+            div#images-container > div > div > img {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                transition: opacity 0.5s ease;
+                box-sizing: border-box;
+            }
+
+            div#images-container > div > div:hover > img {
+                box-shadow: 0 0 0 3px rgba(0,0,0,0.25);
+            }
+
+            div#images-container > div > div > img:active {
+                box-shadow: 0 0 0 3px rgba(0,0,0,0.5);
+                top: 5px;
+                left: 5px;
+                width: calc(100% - 10px);
+                height: calc(100% - 10px);
+            }
+
+            div#images-container > div > div > img.visible {
+                opacity: 1;
+            }
+
+            div#images-container > div > div > div {
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                overflow: hidden;
+                color: #fff;
+                text-shadow: 0 1px #000;
+                padding: 5px;
+                background-color: rgba(0, 0, 0, 0);
+                line-height: 1em;
+            }
+
+            div#images-container > div > div:hover > div {
+                background-color: rgba(0, 0, 0, 0.65);
+            }
+
+                div#images-container > div > div > div > * {
+                    opacity: 0;
+                }
+
+                div#images-container > div > div:hover > div > * {
+                    opacity: 1;
+                }
+
+                div#images-container > div > div > div > h5 {
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5em;
+                }
+
+                div#images-container > div > div > div > small {
+                    font-size: 10px;
+                }
+
+.win-flyout {
+    max-width: 600px;
+}
+
+    .win-flyout button {
+        margin-left: 10px;
+    }
+
+    .win-flyout button.action {
+        margin-top: 16px;
+        margin-left: 20px;
+        float: right;
+    }
+
+    .win-flyout button.red {
+        background-color: #edb3b3;
+        border-color: #edb3b3;
+    }
+
+    .win-flyout button.red:active {
+        color: #fff;
+        background-color: #e04040;
+        border-color: #e04040;
+    }
+
+div.win-settingsflyout {
+    width: 480px;
+}
+
+div.win-settingsflyout#optionsSettings {
+    width: 345px;
+}
+
+    div.win-settingsflyout > div.win-header {
+        background-color: #ec6d51;
+    }
+
+    div#privacySettings.win-settingsflyout > div.win-content {
+    }
+
+        div#privacySettings.win-settingsflyout > div.win-content h1,
+        div#privacySettings.win-settingsflyout > div.win-content h2 {
+            display: none;
+        }
+    
+        div#privacySettings.win-settingsflyout > div.win-content h3 {
+            color: #ec6d51;
+            font-weight: normal;
+            font-size: 18px;
+        }
+    
+        div#privacySettings.win-settingsflyout > div.win-content p {
+            color: #2b2b2b;
+            margin-bottom: 40px;
+        }
+    
+        div#privacySettings.win-settingsflyout > div.win-content p:nth-child(4) {
+            color: #aaa;
+            font-size: 10px;
+        }

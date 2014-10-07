@@ -2,7 +2,7 @@
 <StoreAssociation xmlns="http://schemas.microsoft.com/appx/2010/storeassociation">
   <Publisher>CN=2383AF17-10A3-447D-B221-23DE7A5711FE</Publisher>
   <NamespacePrefix>442666080FC00</NamespacePrefix>
-  <PublisherDisplayName>Yuki KAN / Webnium</PublisherDisplayName>
+  <PublisherDisplayName>Webnium Inc.</PublisherDisplayName>
   <GeneratePackageHash>http://www.w3.org/2001/04/xmlenc#sha256</GeneratePackageHash>
   <SupportedLocales>
     <Language Code="af" InMinimumRequirementSet="false" />

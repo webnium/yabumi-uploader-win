@@ -1,0 +1,3 @@
+[submodule "libraries/flagrate"]
+	path = libraries/flagrate
+	url = git@github.com:webnium/flagrate.git

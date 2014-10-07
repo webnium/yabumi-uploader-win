@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Yabumi</title>
+    <title>Viewer</title>
 
     <!-- WinJS -->
     <link rel="stylesheet" href="//Microsoft.WinJS.2.0/css/ui-light.css">
@@ -14,25 +14,14 @@
     <link rel="stylesheet" href="/libraries/flagrate/flagrate.min.css">
 
     <!-- App -->
-    <script src="/app/default.js"></script>
+    <script src="/app/viewer.js"></script>
     <link rel="stylesheet" href="/app/basic.css">
 </head>
-<body class="default" id="body">
+<body class="viewer" id="body">
 
-    <div id="not-ready" class="mask"></div>
-
-    <div id="header">
-        <img class="logo" src="images/yabumi-mark.svg">
-        <h1 data-win-res="{textContent: 'history'}"></h1>
+    <div id="not-ready" class="mask">
+        <progress class="win-ring"></progress>
     </div>
-
-    <div id="usage-guide">
-
-    </div>
-
-    <div id="images-container"></div>
-
-    <img class="logo" src="images/yabumi-mark.svg">
 
 </body>
 </html>
