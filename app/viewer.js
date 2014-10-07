@@ -351,6 +351,22 @@
         xhr.send();
     };//<--app.f.getInfo()
 
+    app.f.updateInfo = function () {
+
+        app.f.getInfo(function (error, info) {
+
+            if (error) {
+                app.image = null;
+                app.status.error = error;
+            } else {
+                app.image.expiresAt = void 0;
+                flagrate.extendObject(app.image, info);
+            }
+
+            app.f.main();
+        });
+    };//<--app.f.updateInfo()
+
     app.f.getImage = function (imageUrl) {
 
         var xhr = new XMLHttpRequest();
@@ -445,10 +461,10 @@
         });
 
         xhr.send();
-    };//<--app.f.getImage
+    };//<--app.f.getImage()
 
     app.f.getPdf = function () {
-    };
+    };//<--app.f.getPdf()
 
     app.f.setImage = function () {
 
@@ -479,10 +495,117 @@
                 marginTop: (app.status.imageContainerH / 2 - app.view.image.getHeight() / 2) + 'px'
             });
         }
-    };
+    };//<--app.f.setImage()
 
     app.f.expiration = function () {
-    };
+
+        if (app.view.expirationFlyout) {
+            app.view.expirationFlyout.dispose();
+            app.view.expirationFlyout.element.removeNode(true);
+        }
+
+        app.view.expirationFlyout = new WinJS.UI.Flyout(flagrate.createElement().insertTo(app.view.body));
+        app.view.expirationFlyout.addEventListener('afterhide', function () {
+
+            app.view.expirationFlyout.dispose();
+            app.view.expirationFlyout.element.removeNode(true);
+            app.view.expirationFlyout = null;
+        });
+
+        var currentDate = new Date(Date.now() + 1000 * 60 * 60 * 24);
+
+        var datePicker = new WinJS.UI.DatePicker(flagrate.createElement().insertTo(app.view.expirationFlyout.element));
+        datePicker.minYear = new Date().getFullYear();
+        datePicker.maxYear = new Date().getFullYear() + 1;
+        datePicker.yearPattern = "{year.full}";
+        datePicker.monthPattern = "{month.abbreviated}";
+        datePicker.datePattern = "{day.integer(1)}";
+        datePicker.current = currentDate;
+        datePicker.element.style.marginRight = '20px';
+
+        var timePicker = new WinJS.UI.TimePicker(flagrate.createElement().insertTo(app.view.expirationFlyout.element));
+        timePicker.minuteIncrement = 5;
+        timePicker.clock = '24HourClock';
+        timePicker.current = currentDate;
+
+        var setButton = flagrate.createElement('button').insertText(_L('set')).insertTo(app.view.expirationFlyout.element);
+        setButton.addEventListener('click', function () {
+
+            app.f.updateExpire(
+                new Date(
+                    (datePicker.current.getMonth() + 1) + '/' +
+                    datePicker.current.getDate() + '/' +
+                    datePicker.current.getFullYear() + ' ' +
+                    timePicker.current.getHours() + ':' +
+                    timePicker.current.getMinutes()
+                )
+            );
+
+            app.view.expirationFlyout.hide();
+        });
+
+        flagrate.createElement('br').insertTo(app.view.expirationFlyout.element);
+
+        var neverButton = flagrate.createElement('button', {
+            'class': 'action red'
+        }).insertText(_L('clear the expiration')).insertTo(app.view.expirationFlyout.element);
+        neverButton.addEventListener('click', function () {
+
+            app.f.updateExpire(null);
+
+            app.view.expirationFlyout.hide();
+        });
+
+        app.view.expirationFlyout.show(app.view.expirationButton);
+    };//<--app.f.expiration()
+
+    app.f.updateExpire = function (time) {
+
+        if (app.status.requesting === true) {
+            return;
+        }
+        app.status.requesting = true;
+
+        // create mask
+        app.view.mask = flagrate.createElement('div', { 'class': 'mask' }).insertTo(app.view.body);
+        flagrate.createElement('progress', { 'class': 'win-ring' }).insertTo(app.view.mask);
+
+        var expiresAt = null;
+
+        if (time !== null) {
+            // offset
+            if (typeof time === 'number') {
+                expiresAt = Date.now() - app.status.clockOffsetTime + time;
+            } else if (time instanceof Date === true) {
+                expiresAt = time.getTime();
+            }
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', function () {
+
+            app.status.requesting = false;
+            app.view.mask.remove();
+
+            if (xhr.status >= 400 && xhr.status < 600) {
+                var errorText = xhr.responseText;
+                if (/json/.test(xhr.getResponseHeader('Content-Type')) === true) {
+                    errorText = JSON.parse(xhr.responseText).error.text;
+                }
+
+                new Windows.UI.Popups.MessageDialog(
+                    errorText + ' (' + xhr.status + ')',
+                    _L('failed to update')
+                ).showAsync();
+
+                return;
+            }
+
+            app.f.updateInfo();
+        });
+        xhr.open('PUT', app.f.getApiRoot() + 'images/' + app.image.id + '.json');
+        xhr.send(JSON.stringify({ pin: app.image.pin, expiresAt: expiresAt }));
+    };//<--app.f.updateExpire()
 
     app.f.openInBrowser = function () {
 
@@ -545,16 +668,6 @@
         });//<--savePicker.pickSaveFileAsync()
     };//<--app.f.save()
 
-    app.f.prev = function () {
-
-        // todo
-    };
-
-    app.f.next = function () {
-
-        // todo
-    };
-
     app.f.confirmDelete = function () {
 
         if (app.status.requesting === true) {
@@ -609,7 +722,7 @@
         });
         xhr.open('DELETE', app.f.getApiRoot() + 'images/' + app.image.id + '.json');
         xhr.send('pin=' + app.image.pin);
-    };
+    };//<--app.f.delete()
 
     app.f.back = function () {
 
@@ -624,7 +737,57 @@
         } else {
             window.location.href = '/default.html';
         }
-    };
+    };//<--app.f.back()
+
+    app.f.prev = function () {
+
+        var images = [];
+        var i, l, k, v;
+
+        for (i = 0, l = localStorage.length; i < l; i++) {
+            k = localStorage.key(i);
+            v = localStorage.getItem(k);
+
+            if (/^[0-9a-f]{24}$/.test(k) === false || /^[a-f0-9\-]{36}$/.test(v) === false) {
+                continue;
+            }
+
+            images.push(k);
+        }
+
+        for (i = 0, l = images.length; i < l; i++) {
+            if (images[i] === app.image.id) {
+                if (images[i + 1]) {
+                    window.location.href = '/viewer.html?' + images[i + 1] + '#viewer';
+                }
+            }
+        }
+    };//<--app.f.prev()
+
+    app.f.next = function () {
+
+        var images = [];
+        var i, l, k, v;
+
+        for (i = 0, l = localStorage.length; i < l; i++) {
+            k = localStorage.key(i);
+            v = localStorage.getItem(k);
+
+            if (/^[0-9a-f]{24}$/.test(k) === false || /^[a-f0-9\-]{36}$/.test(v) === false) {
+                continue;
+            }
+
+            images.push(k);
+        }
+
+        for (i = 0, l = images.length; i < l; i++) {
+            if (images[i] === app.image.id) {
+                if (images[i - 1]) {
+                    window.location.href = '/viewer.html?' + images[i - 1] + '#viewer';
+                }
+            }
+        }
+    };//<--app.f.next()
 
     app.f.checkLaunchState = function () {
 
@@ -636,7 +799,7 @@
                 app.timer.checkLaunchState = setTimeout(app.f.checkLaunchState, 50);
             }
         }
-    };
+    };//<--app.f.checkLaunchState()
 
     //
     // early process

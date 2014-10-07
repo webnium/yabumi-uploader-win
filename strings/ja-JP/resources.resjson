@@ -56,6 +56,9 @@
     "yes, delete": "はい、削除します",
     "deleted successfully": "削除しました",
     "failed to delete": "削除に失敗しました",
+    "failed to update": "更新に失敗しました",
+    "set": "セット",
+    "clear the expiration": "有効期限をクリア",
 
     "note-no-preview": "このイメージはプレビューすることができません",
     "note-ssl-secure": "通信は完全にSSLで暗号化されます",

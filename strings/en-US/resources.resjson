@@ -56,6 +56,9 @@
     "yes, delete": "Yes, Delete",
     "deleted successfully": "Deleted successfully",
     "failed to delete": "Failed to delete",
+    "failed to update": "Failed to update",
+    "set": "Set",
+    "clear the expiration": "Clear the Expiration",
     
     "note-no-preview": "Can't preview in this image type.",
     "note-ssl-secure": "Communication is absolutely encrypted by SSL.",

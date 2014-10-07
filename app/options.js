@@ -202,7 +202,7 @@
                     if (/json/.test(xhr.getResponseHeader('Content-Type')) === true) {
                         errorText = JSON.parse(xhr.responseText).error.text;
                     }
-                    new Windows.UI.Popups.MessageDialog(errorText, _L('error')).showAsync();
+                    new Windows.UI.Popups.MessageDialog(errorText + ' (' + xhr.status + ')', _L('error')).showAsync();
 
                     mask.remove();
                 }
