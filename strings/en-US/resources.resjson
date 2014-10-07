@@ -53,9 +53,13 @@
     "deactive on this client only": "Deactive on this Client Only",
     "deactive history syncing": "Deactive History Syncing",
     "purge syncing key": "Purge Syncing Key",
+    "yes, delete": "Yes, Delete",
+    "deleted successfully": "Deleted successfully",
+    "failed to delete": "Failed to delete",
     
     "note-no-preview": "Can't preview in this image type.",
     "note-ssl-secure": "Communication is absolutely encrypted by SSL.",
+    "note-delete-image": "Are you sure you want to delete this image?",
     "note-api-root": "These fields are intended for Yabumi Pro or Enterprise and other supported servers.",
     "note-api-root-https": "https://"
 }

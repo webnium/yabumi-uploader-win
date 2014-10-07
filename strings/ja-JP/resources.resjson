@@ -53,9 +53,13 @@
     "deactive on this client only": "このクライアントでのみ無効化",
     "deactive history syncing": "履歴同期を無効化",
     "purge syncing key": "同期キーを完全に消去",
+    "yes, delete": "はい、削除します",
+    "deleted successfully": "削除しました",
+    "failed to delete": "削除に失敗しました",
 
     "note-no-preview": "このイメージはプレビューすることができません",
     "note-ssl-secure": "通信は完全にSSLで暗号化されます",
+    "note-delete-image": "本当にこのイメージを削除してもよろしいですか？",
     "note-api-root": "These fields are intended for Yabumi Pro or Enterprise and other supported servers.",
     "note-api-root-https": "https://"
 }

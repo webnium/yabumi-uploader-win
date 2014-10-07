@@ -20,7 +20,6 @@
         },
         status: {
             initialized: false,
-            requestable: false,
             requesting: false,
             error: null,
             clockOffsetTime: 0,
@@ -38,7 +37,7 @@
         ui: {},
         timer: {}
     };
-    app.image.pin = window.localStorage.getItem(app.image.id);
+    app.image.pin = localStorage.getItem(app.image.id);
 
     //
     // functions
@@ -165,6 +164,10 @@
 
     app.f.onKeydownHandler = function (e) {
 
+        if (app.status.requesting === true) {
+            return;
+        }
+
         var active = document.activeElement && document.activeElement.tagName;
 
         if (active !== 'BODY' && active !== 'DIV' && active !== 'BUTTON') { return; }
@@ -172,8 +175,8 @@
 
         var activated = false;
 
-        // BS:8 | ESC:27 | h:72 -> Back
-        if (e.keyCode === 8 || e.keyCode === 27 || e.keyCode === 72) {
+        // BS:8 | ESC:27 | h:72 | ALT + LEFT -> Back
+        if (e.keyCode === 8 || e.keyCode === 27 || e.keyCode === 72 | (e.altKey && e.keyCode === 37)) {
             activated = true;
             app.f.back();
         }
@@ -191,7 +194,7 @@
         }
 
         // DELETE:46 -> Delete
-        if (e.keyCode === 47) {
+        if (e.keyCode === 46) {
             activated = true;
             app.f.confirmDelete();
         }
@@ -543,15 +546,69 @@
     };//<--app.f.save()
 
     app.f.prev = function () {
+
+        // todo
     };
 
     app.f.next = function () {
+
+        // todo
     };
 
     app.f.confirmDelete = function () {
-    };
+
+        if (app.status.requesting === true) {
+            return;
+        }
+        app.status.requesting = true;
+
+        var dialog = new Windows.UI.Popups.MessageDialog(_L('note-delete-image'));
+
+        dialog.commands.append(new Windows.UI.Popups.UICommand(_L('yes, delete'), function () {
+
+            app.status.requesting = false;
+            app.f.delete();
+        }));
+        dialog.commands.append(new Windows.UI.Popups.UICommand(_L('cancel'), function () {
+            app.status.requesting = false;
+        }));
+
+        dialog.defaultCommandIndex = 0;
+        dialog.cancelCommandIndex = 1;
+
+        dialog.showAsync();
+    };//<--app.f.confirmDelete()
 
     app.f.delete = function () {
+
+        app.status.requesting = true;
+
+        // create mask
+        app.view.mask = flagrate.createElement('div', { 'class': 'mask' }).insertTo(app.view.body);
+        flagrate.createElement('progress', { 'class': 'win-ring' }).insertTo(app.view.mask);
+
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', function () {
+
+            app.status.requesting = false;
+            app.view.mask.remove();
+
+            if (xhr.status >= 400 && xhr.status < 600) {
+                new Windows.UI.Popups.MessageDialog(
+                    xhr.responseText + ' (' + xhr.status + ')',
+                    _L('failed to delete')
+                ).showAsync();
+
+                return;
+            }
+
+            new Windows.UI.Popups.MessageDialog(_L('deleted successfully')).showAsync().done(function () {
+                localStorage.removeItem(app.image.id);
+                app.f.back();
+            });
+        });
+        xhr.open('DELETE', app.f.getApiRoot() + 'images/' + app.image.id + '.json');
+        xhr.send('pin=' + app.image.pin);
     };
 
     app.f.back = function () {
@@ -572,11 +629,11 @@
     app.f.checkLaunchState = function () {
 
         if (app.launchState.domReady === true && app.launchState.gotInfo === true && app.launchState.applicationReady === true) {
-            if (window.flagrate === void 0) {
-                clearTimeout(app.timer.checkLaunchState);
-                app.timer.checkLaunchState = setTimeout(app.f.checkLaunchState, 10);
-            } else {
+            if (window.flagrate) {
                 app.f.init();
+            } else {
+                clearTimeout(app.timer.checkLaunchState);
+                app.timer.checkLaunchState = setTimeout(app.f.checkLaunchState, 50);
             }
         }
     };

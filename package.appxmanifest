@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="442666080FC00.YabumiUploader" Version="1.2.0.18" Publisher="CN=2383AF17-10A3-447D-B221-23DE7A5711FE" />
+  <Identity Name="442666080FC00.YabumiUploader" Version="1.2.0.19" Publisher="CN=2383AF17-10A3-447D-B221-23DE7A5711FE" />
   <Properties>
     <DisplayName>Yabumi Uploader</DisplayName>
     <PublisherDisplayName>Webnium Inc.</PublisherDisplayName>
@@ -30,7 +30,7 @@
           </ShareTarget>
         </Extension>
       </Extensions>
-      <m2:VisualElements DisplayName="Yabumi" Description="https://yabumi.cc/" BackgroundColor="#F7F7F7" ForegroundText="dark" Square150x150Logo="images\Square150x150Logo.png" Square30x30Logo="images\Square30x30Logo.png">
+      <m2:VisualElements DisplayName="Yabumi" Description="https://yabumi.cc/" BackgroundColor="#eeeeee" ForegroundText="dark" Square150x150Logo="images\Square150x150Logo.png" Square30x30Logo="images\Square30x30Logo.png">
         <m2:DefaultTile ShortName="Yabumi" DefaultSize="square150x150Logo" Square70x70Logo="images\Square70x70Logo.png" Wide310x150Logo="images\Wide310x150Logo.png" Square310x310Logo="images\Square310x310Logo.png">
           <m2:ShowNameOnTiles>
             <m2:ShowOn Tile="square150x150Logo" />
@@ -44,7 +44,7 @@
           <m2:Rotation Preference="portraitFlipped" />
           <m2:Rotation Preference="landscapeFlipped" />
         </m2:InitialRotationPreference>
-        <m2:SplashScreen BackgroundColor="#f7f7f7" Image="images\Splash.png" />
+        <m2:SplashScreen BackgroundColor="#eeeeee" Image="images\Splash.png" />
       </m2:VisualElements>
       <ApplicationContentUriRules>
         <Rule Match="https://yabumi.cc/*" Type="include" />
