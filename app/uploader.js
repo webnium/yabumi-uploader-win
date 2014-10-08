@@ -21,7 +21,8 @@
             croppable: false,
             uploading: false,
             uploaded: false,
-            cancelable: true
+            cancelable: true,
+            fromTarget: false
         },
         data: {
             uploadFile: null
@@ -99,13 +100,15 @@
                 app.f.fromCamera();
                 break;
 
-            case '?target':
-                app.f.fromTarget();
+            case '?file':
+                app.f.fromFile();
                 break;
 
-            case '?file':
             default:
-                app.f.fromFile();
+                if (app.shareOperation) {
+                    app.status.fromTarget = true;
+                    app.f.fromTarget();
+                }
         }
 
         // show AppBar
@@ -127,7 +130,7 @@
         var activated = false;
 
         // BS:8 -> Back
-        if (e.keyCode === 8 && window.location.search !== '?target') {
+        if (e.keyCode === 8 && app.status.fromTarget === false) {
             activated = true;
             if (app.status.cancelable === true) {
                 window.history.back();
@@ -200,7 +203,17 @@
 
     app.f.fromTarget = function () {
 
-        // todo
+        app.view.cancelButton.remove();
+
+        if (app.shareOperation.data.contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.storageItems)) {
+            app.shareOperation.data.getStorageItemsAsync().then(function (storageItems) {
+
+                app.f.prepare(storageItems.getAt(0));
+            });
+        } else {
+            app.shareOperation.reportStarted();
+            app.shareOperation.reportError(_L('error'));
+        }
     };
 
     app.f.prepare = function (file) {
@@ -270,6 +283,10 @@
         app.view.croppingButton.disabled = true;
         app.view.cancelButton.disabled = true;
 
+        if (app.shareOperation) {
+            app.shareOperation.reportStarted();
+        }
+
         // create mask
         app.view.mask = flagrate.createElement('div', { 'class': 'mask' }).insertTo(app.view.body);
         flagrate.createElement('progress', { 'class': 'win-ring' }).insertTo(app.view.mask);
@@ -329,14 +346,31 @@
 
                     // go to the uploaded image
                     var jump = function () {
+
                         if (localSettings.values['config.openSystemBrowserAfterUpload']) {
                             Windows.System.Launcher.launchUriAsync(new Windows.Foundation.Uri(imageEditUrl)).then(function () {
-                                app.f.cancel();
+
+                                if (app.shareOperation) {
+                                    app.shareOperation.reportCompleted();
+                                } else {
+                                    window.location.href = '/default.html';
+                                }
                             });
                         } else if (localSettings.values['config.nothingOnUploaded']) {
-                            app.f.cancel();
+                            if (!app.shareOperation) {
+                                window.location.href = '/default.html';
+                            }
                         } else {
-                            window.location.href = '/viewer.html?' + imageId + '#' + window.location.search.replace('?', '');
+                            if (app.shareOperation) {
+                                var url = 'yabumi-uploader://viewer/' + imageId;
+                                Windows.System.Launcher.launchUriAsync(new Windows.Foundation.Uri(url)).then(function () {
+
+                                    app.shareOperation.reportCompleted();
+                                });
+                            } else {
+                                var url = '/viewer.html?' + imageId + '#' + (app.status.fromTarget === true ? 'target' : '');
+                                window.location.href = url;
+                            }
                         }
                     };
                     
@@ -361,6 +395,10 @@
 
                     app.view.mask.remove();
 
+                    if (app.shareOperation) {
+                        app.shareOperation.reportError(_L('failed to upload') + ' (' + statusCode + ')');
+                    }
+
                     new Windows.UI.Popups.MessageDialog(
                         _L('failed to upload') + ' (' + statusCode + ')',
                         _L('error')
@@ -373,6 +411,10 @@
 
                 app.view.mask.remove();
 
+                if (app.shareOperation) {
+                    app.shareOperation.reportError(_L('failed to upload'));
+                }
+
                 new Windows.UI.Popups.MessageDialog(
                     _L('failed to upload'),
                     _L('error')
@@ -383,29 +425,27 @@
 
     app.f.cancel = function () {
 
-        if (app.status.cancelable === false && app.status.uploaded === false) {
+        if (app.status.initialized === false || app.status.cancelable === false || app.status.fromTarget === true) {
             return;
         }
 
-        if (window.location.search === '?target') {
-            window.close();
-        } else {
-            window.location.href = '/default.html';
-        }
+        window.location.href = '/default.html';
     };
 
     //
     // launch
     //
 
+    A.onactivated = function (e) {
+
+        if (e.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.shareTarget) {
+            app.shareOperation = e.detail.shareOperation;
+        }
+    };
+    
     A.onloaded = function (e) {
 
-        app.f.init();
-    };
-
-    A.oncheckpoint = function (e) {
-        // TODO: terminating. use WinJS.Application.sessionState object.
-        // if async operation needed, call the e.setPromise() method.
+        setTimeout(app.f.init, 100);
     };
 
     //

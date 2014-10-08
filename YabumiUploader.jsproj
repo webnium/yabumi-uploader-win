@@ -41,8 +41,8 @@
     <Content Include="app\default.js" />
     <Content Include="app\options.js" />
     <Content Include="app\privacy.js" />
-    <Content Include="app\target.js" />
     <Content Include="app\uploader.js" />
+    <Content Include="app\uri.js" />
     <Content Include="app\viewer.js" />
     <Content Include="images\Splash.scale-100.png" />
     <Content Include="images\Splash.scale-140.png" />
@@ -77,6 +77,7 @@
     <Content Include="images\yabumi-mark.svg" />
     <Content Include="images\yabumi.svg" />
     <Content Include="options.html" />
+    <Content Include="uri.html" />
     <Content Include="viewer.html" />
     <None Include="YabumiUploader_TemporaryKey.pfx" />
     <None Include="Package.StoreAssociation.xml">
@@ -86,7 +87,6 @@
     <Content Include="libraries\flagrate\flagrate.min.js" />
     <Content Include="uploader.html" />
     <Content Include="privacy.html" />
-    <Content Include="target.html" />
     <Content Include="default.html" />
   </ItemGroup>
   <ItemGroup>

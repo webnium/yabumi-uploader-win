@@ -96,6 +96,7 @@
         app.view.copyUrlButton = flagrate.createElement('button');
         app.view.openInBrowserButton = flagrate.createElement('button');
         app.view.saveButton = flagrate.createElement('button');
+        app.view.openWithButton = flagrate.createElement('button');
 
         app.ui.appBar = new WinJS.UI.AppBar(
             flagrate.createElement('div', { id: 'app-bar' }).insertTo(app.view.body),
@@ -129,6 +130,13 @@
                         tooltip: _L('save') + ' (Ctrl+S)',
                         onclick: app.f.save
                     }),
+                    new WinJS.UI.AppBarCommand(app.view.openWithButton, {
+                        section: 'selection',
+                        icon: 'openwith',
+                        label: _L('open with'),
+                        tooltip: _L('open with'),
+                        onclick: app.f.openWith
+                    }),
                     new WinJS.UI.AppBarCommand(app.view.copyUrlButton, {
                         section: 'selection',
                         icon: 'link',
@@ -140,7 +148,7 @@
                         section: 'selection',
                         icon: 'go',
                         label: _L('open in browser'),
-                        tooltip: _L('open in browser') + ' (X)',
+                        tooltip: _L('open in browser') + ' (B)',
                         onclick: app.f.openInBrowser
                     })
                 ],
@@ -211,8 +219,8 @@
             app.view.infoContainer.toggleClassName('visible');
         }
 
-        // x:88 -> Open In Browser
-        if (e.keyCode === 88) {
+        // b:66 -> Open In Browser
+        if (e.keyCode === 66) {
             activated = true;
             app.f.openInBrowser();
         }
@@ -502,6 +510,8 @@
         if (app.view.expirationFlyout) {
             app.view.expirationFlyout.dispose();
             app.view.expirationFlyout.element.removeNode(true);
+            app.view.expirationFlyout = null;
+            return;
         }
 
         app.view.expirationFlyout = new WinJS.UI.Flyout(flagrate.createElement().insertTo(app.view.body));
@@ -627,6 +637,48 @@
         Windows.ApplicationModel.DataTransfer.Clipboard.setContent(dataPackage);
     };
 
+    app.f.openWith = function () {
+
+        if (!app.image || !app.image.extension || !app.data.image) {
+            return;
+        }
+
+        var filename = app.image.id + '.' + app.image.extension;
+
+        var temporaryFolder = Windows.Storage.ApplicationData.current.temporaryFolder;
+        temporaryFolder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting)
+            .then(function (file) {
+
+                if (!file) {
+                    return;
+                }
+
+                file.openAsync(Windows.Storage.FileAccessMode.readWrite).then(function (output) {
+
+                    // Get the IInputStream stream from the blob object
+                    var input = app.data.image.msDetachStream();
+
+                    // Copy the stream from the blob to the File stream 
+                    Windows.Storage.Streams.RandomAccessStream.copyAsync(input, output).then(function () {
+
+                        output.flushAsync().done(function () {
+
+                            input.close();
+                            output.close();
+
+                            temporaryFolder.getFileAsync(filename).then(function (file) {
+
+                                var options = new Windows.System.LauncherOptions();
+                                options.displayApplicationPicker = true;
+
+                                Windows.System.Launcher.launchFileAsync(file, options);
+                            });
+                        });
+                    });
+                });
+        });
+    };
+
     app.f.save = function () {
 
         if (!app.image || !app.image.extension || !app.data.image) {
@@ -707,8 +759,13 @@
             app.view.mask.remove();
 
             if (xhr.status >= 400 && xhr.status < 600) {
+                var errorText = xhr.responseText;
+                if (/json/.test(xhr.getResponseHeader('Content-Type')) === true) {
+                    errorText = JSON.parse(xhr.responseText).error.text;
+                }
+
                 new Windows.UI.Popups.MessageDialog(
-                    xhr.responseText + ' (' + xhr.status + ')',
+                    errorText + ' (' + xhr.status + ')',
                     _L('failed to delete')
                 ).showAsync();
 

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="442666080FC00.YabumiUploader" Version="1.2.0.20" Publisher="CN=2383AF17-10A3-447D-B221-23DE7A5711FE" />
+  <Identity Name="442666080FC00.YabumiUploader" Version="1.2.0.21" Publisher="CN=2383AF17-10A3-447D-B221-23DE7A5711FE" />
   <Properties>
     <DisplayName>Yabumi Uploader</DisplayName>
     <PublisherDisplayName>Webnium Inc.</PublisherDisplayName>
@@ -17,7 +17,7 @@
   <Applications>
     <Application Id="Microsoft.SDKSamples.ShareTargetSample" StartPage="default.html">
       <Extensions>
-        <Extension Category="windows.shareTarget" StartPage="target.html">
+        <Extension Category="windows.shareTarget" StartPage="uploader.html">
           <ShareTarget>
             <SupportedFileTypes>
               <FileType>.jpg</FileType>
@@ -28,6 +28,9 @@
               <FileType>.pdf</FileType>
             </SupportedFileTypes>
           </ShareTarget>
+        </Extension>
+        <Extension Category="windows.protocol" StartPage="uri.html">
+          <Protocol Name="yabumi-uploader" />
         </Extension>
       </Extensions>
       <m2:VisualElements DisplayName="Yabumi" Description="https://yabumi.cc/" BackgroundColor="#eeeeee" ForegroundText="dark" Square150x150Logo="images\Square150x150Logo.png" Square30x30Logo="images\Square30x30Logo.png">
