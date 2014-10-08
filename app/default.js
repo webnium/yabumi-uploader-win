@@ -374,6 +374,8 @@
             flagrate.Element.remove(app.view.imagesContainer.childNodes[i]);
         }
 
+        var targetImages = [];
+
         for (i = 0, l = app.images.length; i < l; i++) {
             image = app.images[i];
 
@@ -434,8 +436,7 @@
 
             // get thumbnail if display range
             if (!image.acquiredThumbnail && (height > viewScroll - 400) && (height < viewScroll + viewHeight)) {
-                image.acquiredThumbnail = true;
-                app.f.getThumbnail(image);
+                targetImages.push(image);
             }
 
             line.width += image._width;
@@ -470,6 +471,11 @@
         clearTimeout(app.timer.updateScrollTop);
         app.timer.updateScrollTop = setTimeout(function () {
 
+            for (i = 0, l = targetImages.length; i < l; i++) {
+                targetImages[i].acquiredThumbnail = true;
+                app.f.getThumbnail(targetImages[i]);
+            }
+
             sessionStorage.setItem('default.scrollTop', viewScroll.toString(10));
         }, 250);
     };//<--app.f.viewImages()
@@ -480,24 +486,31 @@
 
         xhr.addEventListener('load', function () {
 
-            var images = JSON.parse(xhr.responseText);
+            if (xhr.status === 200) {
+                var images = JSON.parse(xhr.responseText);
 
-            app.images.forEach(function (image) {
+                app.images.forEach(function (image) {
 
-                var i, l, found = false;
-                for (i = 0, l = images.length; i < l; i++) {
-                    if (images[i].id === image.id) {
-                        found = true;
-                        break;
+                    var i, l, found = false;
+                    for (i = 0, l = images.length; i < l; i++) {
+                        if (images[i].id === image.id) {
+                            found = true;
+                            break;
+                        }
                     }
-                }
 
-                if (found === false) {
-                    localStorage.removeItem(image.id);
-                }
-            });//<--app.images.forEach()
+                    if (found === false) {
+                        localStorage.removeItem(image.id);
+                    }
+                });//<--app.images.forEach()
 
-            app.images = images;
+                app.images = images;
+            } else {
+                new Windows.UI.Popups.MessageDialog(
+                    xhr.statusText + ' (' + xhr.status + ')',
+                    _L('error')
+                ).showAsync();
+            }
 
             done();
         });
@@ -508,8 +521,8 @@
             ids.push(image.id);
         });
 
-        xhr.open('GET', app.f.getApiRoot(true) + 'images.json?id=' + ids.join('%2B'));
-        xhr.send();
+        xhr.open('POST', app.f.getApiRoot(true) + 'images.json');
+        xhr.send('_method=get&id=' + ids.join('%2B'));
     };
 
     app.f.saveHistory = function () {
