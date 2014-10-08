@@ -487,11 +487,154 @@
             app.status.imageContainerW < app.image.width ||
             app.status.imageContainerH < app.image.height
         );
-
         if (isLarge) {
+            app.view.image.style.maxWidth = app.status.imageContainerW + 'px';
+            app.view.image.style.maxHeight = app.status.imageContainerH + 'px';
+        }
 
-        } else {
+        app.status.imageMinSizeW = app.view.image.getWidth();
+        app.status.imageMinSizeH = app.view.image.getHeight();
+        app.status.imageCurSizeW = app.status.imageContainerW;
+        app.status.imageCurSizeH = app.status.imageContainerH;
 
+        app.view.image.style.zoom = 1.0;
+
+        if (!app.status.gestureEventInitialized) {
+            app.status.gestureEventInitialized = true;
+
+            app.status.pointerCount = 0;
+            app.status.lastPointerX = 0;
+            app.status.lastPointerY = 0;
+            app.status.imageScrollL = 0;
+            app.status.imageScrollT = 0;
+
+            app.view.imageContainer.addEventListener('scroll', function (e) {
+
+                // updates scroll position
+                if (Math.floor(app.status.imageScrollL) !== app.view.imageContainer.scrollLeft) {
+                    app.status.imageScrollL = app.view.imageContainer.scrollLeft;
+                }
+                if (Math.floor(app.status.imageScrollT) !== app.view.imageContainer.scrollTop) {
+                    app.status.imageScrollT = app.view.imageContainer.scrollTop;
+                }
+            });
+
+            var gestureTarget = app.view.imageContainer;
+
+            var msGesture = new window.MSGesture();
+            msGesture.target = gestureTarget;
+            
+            gestureTarget.addEventListener('pointerdown', function (e) {
+
+                ++app.status.pointerCount;
+                msGesture.addPointer(e.pointerId);
+
+                app.status.lastPointerX = e.offsetX;
+                app.status.lastPointerY = e.offsetY;
+
+                e.stopPropagation();
+                e.preventDefault();
+            }, true);
+
+            window.addEventListener('pointerup', function (e) {
+
+                if (app.status.pointerCount > 0) {
+                    --app.status.pointerCount;
+                }
+
+                e.stopPropagation();
+            }, true);
+
+            window.addEventListener('pointercancel', function (e) {
+
+                if (app.status.pointerCount > 0) {
+                    --app.status.pointerCount;
+                }
+
+                e.stopPropagation();
+            }, true);
+            
+            gestureTarget.addEventListener('pointermove', function (e) {
+
+                if (app.status.pointerCount === 1) {
+                    var x = e.offsetX - app.status.lastPointerX;
+                    var y = e.offsetY - app.status.lastPointerY;
+
+                    app.view.imageContainer.scrollLeft = app.status.imageScrollL - x;
+                    app.view.imageContainer.scrollTop = app.status.imageScrollT - y;
+                }
+
+                e.stopPropagation();
+            }, true);
+            
+            var zoomBy = function (scale) {
+
+                app.status.imageCurSizeW = app.view.image.getWidth() * app.view.image.style.zoom;
+                app.status.imageCurSizeH = app.view.image.getHeight() * app.view.image.style.zoom;
+
+                // gets scroll position
+                var scrollL = app.status.imageScrollL / (app.status.imageCurSizeW - app.status.imageContainerW) * 100;
+                if (isNaN(scrollL) || app.status.imageCurSizeW - app.status.imageContainerW < 10) {
+                    app.status.imageScrollL = 0;
+                    scrollL = 50;
+                }
+                var scrollT = app.status.imageScrollT / (app.status.imageCurSizeH - app.status.imageContainerH) * 100;
+                if (isNaN(scrollT) || app.status.imageCurSizeH - app.status.imageContainerH < 10) {
+                    app.status.imageScrollT = 0;
+                    scrollT = 50;
+                }
+
+                // scale
+                app.view.image.style.zoom *= scale;
+
+                app.status.imageCurSizeW = app.view.image.getWidth() * app.view.image.style.zoom;
+                app.status.imageCurSizeH = app.view.image.getHeight() * app.view.image.style.zoom;
+
+                var isOverMin = (app.view.image.style.zoom < 1.0);
+                if (isOverMin) {
+                    app.view.image.style.zoom = 1.0;
+                }
+                var isOverMax = (
+                    app.status.imageCurSizeW > (app.image.width * 2) ||
+                    app.status.imageCurSizeH > (app.image.height * 2)
+                );
+                if (isOverMax) {
+                    app.view.image.style.zoom /= scale;
+                }
+
+                app.status.imageCurSizeW = app.view.image.getWidth() * app.view.image.style.zoom;
+                app.status.imageCurSizeH = app.view.image.getHeight() * app.view.image.style.zoom;
+
+                // saves scroll position
+                app.status.imageScrollL = (app.status.imageCurSizeW - app.status.imageContainerW) * (scrollL / 100);
+                app.status.imageScrollT = (app.status.imageCurSizeH - app.status.imageContainerH) * (scrollT / 100);
+
+                // updates scroll position
+                app.view.imageContainer.scrollLeft = app.status.imageScrollL;
+                app.view.imageContainer.scrollTop = app.status.imageScrollT;
+
+                if (app.status.imageContainerH < app.status.imageCurSizeH) {
+                    app.view.image.setStyle({
+                        marginTop: '0px'
+                    });
+                } else {
+                    app.view.image.setStyle({
+                        marginTop: (app.status.imageContainerH / 2 - app.status.imageCurSizeH / 2) + 'px'
+                    });
+                }
+            };//<--zoomBy(scale)
+
+            gestureTarget.addEventListener('MSGestureChange', function (e) {
+
+                zoomBy(e.scale);
+            }, true);
+
+            gestureTarget.addEventListener('mousewheel', function (e) {
+
+                zoomBy(e.wheelDelta > 0 ? 1.1 : 0.9);
+
+                e.preventDefault();
+            }, true);
         }
 
         if (app.status.imageContainerH < app.view.image.getHeight()) {
@@ -671,7 +814,10 @@
                                 var options = new Windows.System.LauncherOptions();
                                 options.displayApplicationPicker = true;
 
-                                Windows.System.Launcher.launchFileAsync(file, options);
+                                Windows.System.Launcher.launchFileAsync(file, options).done(function () {
+
+                                    window.location.reload();
+                                });
                             });
                         });
                     });
@@ -853,7 +999,7 @@
                 app.f.init();
             } else {
                 clearTimeout(app.timer.checkLaunchState);
-                app.timer.checkLaunchState = setTimeout(app.f.checkLaunchState, 50);
+                app.timer.checkLaunchState = setTimeout(app.f.checkLaunchState, 10);
             }
         }
     };//<--app.f.checkLaunchState()

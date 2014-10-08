@@ -150,24 +150,15 @@ div.image-container {
         -ms-user-select: none;
         -ms-touch-action: none;
         transition: opacity 0.25s ease;
+        cursor: url(../images/grasping-hand-open.cur), default;
+    }
+
+    div.image-container > img.image:active {
+        cursor: url(../images/grasping-hand-closed.cur), default;
     }
 
     div.image-container > img.image.hide {
         opacity: 0;
-    }
-
-    div.image-container > img.image.resizable {
-        /* cursor: zoom-out; */
-    }
-
-    div.image-container > img.image.resizable.fit {
-        /* cursor: zoom-in; */
-        max-width: 100% !important;
-    }
-
-    div.image-container > img.image.resizable.fit.fit-vertically {
-        max-height: 100% !important;
-        height: 100% !important;
     }
 
     div.image-container > iframe.pdf {

@@ -234,7 +234,7 @@
             app.view.croppingButton.disabled = false;
         }
 
-        if (['.jpg', '.jpeg', '.png', '.gif'].indexOf(app.data.uploadFile.fileType.toLowerCase()) !== -1) {
+        if (['.svg', '.jpg', '.jpeg', '.png', '.gif'].indexOf(app.data.uploadFile.fileType.toLowerCase()) !== -1) {
             app.f.preview(app.data.uploadFile);
         } else {
             app.f.preview();

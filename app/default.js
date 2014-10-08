@@ -49,7 +49,7 @@
         app.view.body = document.getElementById('body');
         app.view.imagesContainer = flagrate.Element.extend(document.getElementById('images-container'));
 
-        app.status.imagesContainerWidth = app.view.imagesContainer.getWidth();
+        app.status.imagesContainerWidth = parseInt(window.getComputedStyle(app.view.imagesContainer).width.replace('px', ''), 10);
 
         // create AppBar
         app.view.appBar = flagrate.createElement('div', { id: 'app-bar', 'class': 'win-ui-dark' }).insertTo(app.view.body);
@@ -118,7 +118,7 @@
         });
         window.addEventListener('resize', function () {
 
-            app.status.imagesContainerWidth = app.view.imagesContainer.getWidth();
+            app.status.imagesContainerWidth = parseInt(window.getComputedStyle(app.view.imagesContainer).width.replace('px', ''), 10);
             app.f.viewImages();
         });
     };
@@ -462,7 +462,7 @@
                 }
             }
 
-            if (height > viewScroll + viewHeight + 600) {
+            if (height > viewScroll + viewHeight + 1280) {
                 break;
             }
         }//<--for app.images

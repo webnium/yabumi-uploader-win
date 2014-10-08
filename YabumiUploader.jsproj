@@ -44,6 +44,8 @@
     <Content Include="app\uploader.js" />
     <Content Include="app\uri.js" />
     <Content Include="app\viewer.js" />
+    <Content Include="images\grasping-hand-closed.cur" />
+    <Content Include="images\grasping-hand-open.cur" />
     <Content Include="images\Splash.scale-100.png" />
     <Content Include="images\Splash.scale-140.png" />
     <Content Include="images\Splash.scale-180.png" />
