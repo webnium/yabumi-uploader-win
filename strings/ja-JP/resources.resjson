@@ -60,6 +60,7 @@
     "set": "セット",
     "clear the expiration": "有効期限をクリア",
     "open with": "プログラムから開く",
+    "share a url of this image": "このイメージのURLを共有",
 
     "note-no-preview": "このイメージはプレビューすることができません",
     "note-ssl-secure": "通信は完全にSSLで暗号化されます",

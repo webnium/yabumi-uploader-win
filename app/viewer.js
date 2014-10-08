@@ -166,6 +166,10 @@
         // main listeners
         window.addEventListener('resize', app.f.setImage);
 
+        // share to target
+        var dataTransferManager = Windows.ApplicationModel.DataTransfer.DataTransferManager.getForCurrentView();
+        dataTransferManager.addEventListener('datarequested', app.f.shareHandler);
+
         // now ready
         document.getElementById('not-ready').removeNode(true);
     };//<--app.f.init()
@@ -249,7 +253,28 @@
             e.stopPropagation();
             e.preventDefault();
         }
-    };
+    };//<--app.f.onKeydownHandler(e)
+
+    app.f.shareHandler = function (e) {
+
+        if (!app.image || !app.image.extension || !app.data.image) {
+            return;
+        }
+
+        var filename = app.image.id + '.' + app.image.extension;
+
+        var title = app.image.name || app.image.id;
+        if (/\.[^.]{3,4}$/.test(title) === true) {
+            title = title.match(/^(.+)\.[^.]+$/)[1];
+        }
+
+        var request = e.request;
+
+        request.data.properties.title = title;
+        request.data.properties.description = _L('share a url of this image');
+
+        request.data.setUri(new Windows.Foundation.Uri(app.image.url));
+    };//<--app.f.shareHandler(e)
 
     app.f.main = function () {
         
@@ -822,7 +847,8 @@
                         });
                     });
                 });
-        });
+            });
+        //<--temporaryFolder.createFileAsync()
     };
 
     app.f.save = function () {
