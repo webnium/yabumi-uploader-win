@@ -69,9 +69,6 @@
         // create progress
         app.view.progress = flagrate.createProgress();
 
-        // main
-        app.f.main();
-
         // craete topAppBar
         app.ui.topAppBar = new WinJS.UI.AppBar(
             flagrate.createElement('div', { id: 'top-app-bar' }).insertTo(app.view.body),
@@ -88,6 +85,9 @@
                 placement: 'top'
             }
         );
+
+        // main
+        app.f.main();
 
         // create AppBar
         app.view.deleteButton = flagrate.createElement('button');
@@ -155,6 +155,16 @@
                 sticky: true
             }
         );
+
+        app.ui.appBar.addEventListener('aftershow', function () {
+
+            flagrate.Element.addClassName(app.view.body, 'app-bar-showing');
+        });
+
+        app.ui.appBar.addEventListener('afterhide', function () {
+
+            flagrate.Element.removeClassName(app.view.body, 'app-bar-showing');
+        });
 
         // show AppBars
         app.ui.topAppBar.show();
@@ -400,10 +410,10 @@
         });
     };//<--app.f.updateInfo()
 
-    app.f.getImage = function (imageUrl) {
+    app.f.getData = function (url, done) {
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', imageUrl);
+        xhr.open('GET', url);
         xhr.responseType = 'blob';
 
         app.view.progress.insertTo(app.view.imageContainer);
@@ -449,11 +459,32 @@
                 }
             }
 
+            app.data.image = xhr.response;
+
+            if (mbps) {
+                app.view.infoForm.getField('size')._div.getElementsByTagName('p')[0].insertText(' (' + mbps + 'Mbps)');
+            } else {
+                app.view.infoForm.getField('size')._div.getElementsByTagName('p')[0].insertText(' (' + _L('cached') + ')');
+            }
+
+            setTimeout(function () {
+                app.view.progress.remove();
+            }, 100);
+
+            done();
+        });
+
+        xhr.send();
+    };//<--app.f.getData()
+
+    app.f.getImage = function (imageUrl) {
+
+        app.f.getData(imageUrl, function () {
+
             if (app.view.image) {
                 app.view.image.remove();
             }
 
-            app.data.image = xhr.response;
             app.view.image = flagrate.createElement('img', {
                 'class': 'image hide',
                 src: URL.createObjectURL(app.data.image, { oneTimeOnly: true })
@@ -464,17 +495,7 @@
                 app.view.image.style.maxHeight = app.image.height + 'px';
             }
 
-            if (mbps) {
-                app.view.infoForm.getField('size')._div.getElementsByTagName('p')[0].insertText(' (' + mbps + 'Mbps)');
-            } else {
-                app.view.infoForm.getField('size')._div.getElementsByTagName('p')[0].insertText(' (' + _L('cached') + ')');
-            }
-
             app.view.image.addEventListener('load', function () {
-
-                setTimeout(function () {
-                    app.view.progress.remove();
-                }, 100);
 
                 if (!app.image.width || !app.image.height) {
                     app.image.width = app.view.image.getWidth();
@@ -492,11 +513,39 @@
 
             app.view.image.insertTo(app.view.imageContainer);
         });
-
-        xhr.send();
     };//<--app.f.getImage()
 
-    app.f.getPdf = function () {
+    app.f.getPdf = function (pdfUrl) {
+
+        app.f.getData(pdfUrl, function () {
+
+            app.view.iframe = flagrate.createElement('iframe', {
+                'class': 'pdf',
+                src: '/libraries/pdf.js/web/viewer.html?file=' + encodeURIComponent(URL.createObjectURL(app.data.image, { oneTimeOnly: true }))
+            }).insertTo(app.view.imageContainer);
+
+            app.view.iframe.onload = function () {
+
+                // adjust style
+                app.view.iframe.contentDocument.head.appendChild(flagrate.createElement('link', { rel: 'stylesheet', href: '/app/pdf.js.css' }));
+
+                app.view.iframe.contentWindow.HandTool.toggle();
+            };
+
+            if (!app.status.pdfJsIntgInitialized) {
+                app.status.pdfJsIntgInitialized = true;
+
+                app.ui.topAppBar.addEventListener('aftershow', function () {
+
+                    app.view.iframe.contentDocument.body.className = '';
+                });
+
+                app.ui.topAppBar.addEventListener('afterhide', function () {
+
+                    app.view.iframe.contentDocument.body.className = 'fullscreen';
+                });
+            }
+        });
     };//<--app.f.getPdf()
 
     app.f.setImage = function () {

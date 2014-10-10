@@ -190,10 +190,14 @@ div.info-container {
 
 div.info-container.visible {
     padding: 10px 15px;
-    height: 360px;
+    height: 260px;
     overflow: auto;
     opacity: 1;
     -ms-user-select: text;
+}
+
+body.app-bar-showing div.info-container.visible {
+    height: 360px;
 }
 
     div.info-container > button.remove {
@@ -285,7 +289,7 @@ div#images-container {
         div#images-container > div > div {
             position: relative;
             display: inline-block;
-            background-color: #e7e7e7;
+            background-color: #eaeaea;
             margin-left: 10px;
         }
 
@@ -321,6 +325,11 @@ div#images-container {
 
             div#images-container > div > div > img.visible {
                 opacity: 1;
+            }
+
+            div#images-container > div > div > img.pdf {
+                opacity: 1;
+                padding: 20px;
             }
 
             div#images-container > div > div > div {

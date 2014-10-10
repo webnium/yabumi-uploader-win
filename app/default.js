@@ -333,20 +333,27 @@
 
     app.f.getThumbnail = function (image) {
 
-        var url = app.f.getApiRoot(true) + 'images/' + image.id + '.';
-
-        if (image.extension === 'gif' && image.size > 1024 * 1024) {
-            url += 'jpg?v=' + image.__v + '&convert=low';
-        } else if (image.extension !== 'gif' && (image.width + image.height > 2000 || image.size > 1024 * 400)) {
-            url += 'jpg?v=' + image.__v + '&convert=low';
+        if (image.extension === 'pdf') {
+            var img = flagrate.createElement('img', {
+                src: '/images/thumbnail-pdf.svg',
+                'class': 'visible pdf'
+            }).insertTo(image._div);
         } else {
-            url += image.extension + '?v=' + image.__v;
-        }
+            var url = app.f.getApiRoot(true) + 'images/' + image.id + '.';
 
-        var img = flagrate.createElement('img', {
-            src: url,
-            onload: 'this.className = "visible"'
-        }).insertTo(image._div);
+            if (image.extension === 'gif' && image.size > 1024 * 1024) {
+                url += 'jpg?v=' + image.__v + '&convert=low';
+            } else if (image.extension !== 'gif' && (image.width + image.height > 2000 || image.size > 1024 * 400)) {
+                url += 'jpg?v=' + image.__v + '&convert=low';
+            } else {
+                url += image.extension + '?v=' + image.__v;
+            }
+
+            var img = flagrate.createElement('img', {
+                src: url,
+                onload: 'this.className = "visible"'
+            }).insertTo(image._div);
+        }
     };
 
     app.f.viewImages = function () {
@@ -549,6 +556,10 @@
 
         A.onsettings = function (e) {
             e.detail.applicationcommands = {
+                'aboutSettings': {
+                    title: _L('about yabumi'),
+                    href: 'about.html'
+                },
                 'optionsSettings': {
                     title: _L('options'),
                     href: 'options.html'

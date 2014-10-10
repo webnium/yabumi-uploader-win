@@ -1,3 +1,7 @@
 [submodule "libraries/flagrate"]
 	path = libraries/flagrate
 	url = git@github.com:webnium/flagrate.git
+[submodule "libraries/pdf.js"]
+	path = libraries/pdf.js
+	url = https://github.com/mozilla/pdf.js.git
+	branch = gh-pages

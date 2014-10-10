@@ -1,0 +1,41 @@
+﻿body {
+    background-image: none;
+}
+
+#viewerContainer {
+    top: 160px;
+    transition: all 0.5s ease;
+}
+
+body.fullscreen #viewerContainer {
+    top: 40px;
+}
+
+#toolbarContainer,
+.findbar,
+.secondaryToolbar {
+    height: 160px;
+    background-image: none;
+    transition: all 0.5s ease;
+}
+
+body.fullscreen #toolbarContainer,
+body.fullscreen .findbar,
+body.fullscreen .secondaryToolbar {
+    height: 40px;
+}
+
+#toolbarViewer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+#secondaryToolbarToggle,
+#download,
+#viewBookmark,
+#openFile,
+.verticalToolbarSeparator:nth-last-child(2) {
+    display: none;
+}
