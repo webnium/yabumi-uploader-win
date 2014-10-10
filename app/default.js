@@ -114,7 +114,7 @@
         document.body.addEventListener('scroll', function () {
 
             clearTimeout(app.timer.scrollToViewImage);
-            app.timer.scrollToViewImage = setTimeout(app.f.viewImages, 20);
+            app.timer.scrollToViewImage = setTimeout(app.f.viewImages, 10);
         });
         window.addEventListener('resize', function () {
 
@@ -349,10 +349,32 @@
                 url += image.extension + '?v=' + image.__v;
             }
 
-            var img = flagrate.createElement('img', {
-                src: url,
-                onload: 'this.className = "visible"'
-            }).insertTo(image._div);
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.responseType = 'blob';
+
+            var progress = flagrate.createElement('progress', { value: 0, max: image.size }).insertTo(image._div);
+
+            xhr.addEventListener('progress', function (e) {
+
+                progress.value = e.loaded;
+            });
+
+            xhr.addEventListener('load', function () {
+
+                if (xhr.status >= 400 && xhr.status < 600) {
+                    console.log(xhr.status + ' ' + xhr.statusText + ': ' + url);
+                } else {
+                    progress.remove();
+
+                    var img = flagrate.createElement('img', {
+                        src: URL.createObjectURL(xhr.response, { oneTimeOnly: true }),
+                        onload: 'this.className = "visible"'
+                    }).insertTo(image._div);
+                }
+            });
+
+            xhr.send();
         }
     };
 
@@ -478,13 +500,17 @@
         clearTimeout(app.timer.updateScrollTop);
         app.timer.updateScrollTop = setTimeout(function () {
 
-            for (i = 0, l = targetImages.length; i < l; i++) {
-                targetImages[i].acquiredThumbnail = true;
-                app.f.getThumbnail(targetImages[i]);
-            }
+            targetImages.forEach(function (image, i) {
+
+                image.acquiredThumbnail = true;
+                setTimeout(function () {
+
+                    app.f.getThumbnail(image);
+                }, 15 * i);
+            });
 
             sessionStorage.setItem('default.scrollTop', viewScroll.toString(10));
-        }, 250);
+        }, 300);
     };//<--app.f.viewImages()
 
     app.f.getImages = function (done) {

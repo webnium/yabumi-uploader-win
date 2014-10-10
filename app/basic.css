@@ -297,6 +297,16 @@ div#images-container {
             margin-left: 0;
         }
 
+            div#images-container > div > div > progress {
+                position: absolute;
+                top: 0;
+                right: 0;
+                left: 0;
+                width: auto;
+                color: #ec6d51;
+                background-color: #ddd;
+            }
+
             div#images-container > div > div > img {
                 position: absolute;
                 top: 0;
