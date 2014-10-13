@@ -13,3 +13,4 @@ BundleArtifacts/
 *.zip
 *.pfx
 *.appxupload
+Package.StoreAssociation.xml
