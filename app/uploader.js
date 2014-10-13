@@ -25,7 +25,8 @@
             fromTarget: false
         },
         data: {
-            uploadFile: null
+            uploadFile: null,
+            uploadFileObjectURL: ''
         },
         f: {},
         view: {},
@@ -250,8 +251,10 @@
 
             file.openReadAsync().then(function (readStream) {
 
+                app.data.uploadFileObjectURL = URL.createObjectURL(readStream);
+
                 flagrate.createElement().setStyle({
-                    backgroundImage: 'url(' + URL.createObjectURL(readStream, { oneTimeOnly: true }) + ')'
+                    backgroundImage: 'url(' + app.data.uploadFileObjectURL + ')'
                 }).insertTo(app.view.preview);
 
                 progress.remove();
@@ -263,12 +266,368 @@
 
     app.f.cropping = function () {
 
-        if (app.status.croppable === false) {
+        if (app.status.croppable === false || app.data.uploadFileObjectURL === '') {
             return;
         }
+        app.status.croppable = false;
+        app.status.uploadable = false;
 
-        // todo
-    };
+        app.view.appBar.remove();
+
+        var viewW = app.view.preview.getWidth();
+        var viewH = app.view.preview.getHeight();
+        var viewAR = viewW / viewH;
+        var imgW = 0;
+        var imgH = 0;
+        var imgAR = 1;
+        var ratio = 1;
+        var cropX = 0;
+        var cropY = 0;
+        var cropW = 0;
+        var cropH = 0;
+
+        var croppingContainer = flagrate.createElement('div', { 'class': 'cropping-container' }).insertTo(app.view.preview);
+
+        var canvas = flagrate.createElement('canvas').insertTo(croppingContainer);
+        var context = canvas.getContext('2d');
+        var img = flagrate.createElement('img', {
+            src: app.data.uploadFileObjectURL
+        });
+        img.onload = function () {
+
+            imgW = img.width;
+            imgH = img.height;
+            imgAR = imgW / imgH;
+
+            setTimeout(init, 0);
+        };
+
+        var topLeftHandle = flagrate.createElement('div', { 'class': 'cropping-handle' }).insertTo(croppingContainer);
+        var topRightHandle = flagrate.createElement('div', { 'class': 'cropping-handle' }).insertTo(croppingContainer);
+        var bottomRightHandle = flagrate.createElement('div', { 'class': 'cropping-handle' }).insertTo(croppingContainer);
+        var bottomLeftHandle = flagrate.createElement('div', { 'class': 'cropping-handle' }).insertTo(croppingContainer);
+
+        var init = function () {
+
+            if (imgAR > viewAR) {
+                ratio = viewW / imgW;
+            } else {
+                ratio = viewH / imgH;
+            }
+
+            // init area
+            cropX = Math.round(imgW * 0.2);
+            cropY = Math.round(imgH * 0.2);
+            cropW = Math.round(imgW * 0.5);
+            cropH = Math.round(imgH * 0.5);
+
+            update();
+
+            // init events
+            var pointerCount = 0;
+            var initPointerX = 0;
+            var initPointerY = 0;
+            var initPositionX = 0;
+            var initPositionY = 0;
+            var initPositionW = 0;
+            var initPositionH = 0;
+            var panning = false;
+            var resizingTL = false;
+            var resizingTR = false;
+            var resizingBL = false;
+            var resizingBR = false;
+
+            canvas.addEventListener('pointerdown', function (e) {
+
+                if (pointerCount !== 0) {
+                    return;
+                }
+                ++pointerCount;
+                panning = true;
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                initPointerX = e.x;
+                initPointerY = e.y;
+                initPositionX = cropX;
+                initPositionY = cropY;
+            }, true);
+
+            topLeftHandle.addEventListener('pointerdown', function (e) {
+
+                if (pointerCount !== 0) {
+                    return;
+                }
+                ++pointerCount;
+                resizingTL = true;
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                initPointerX = e.x;
+                initPointerY = e.y;
+                initPositionX = cropX;
+                initPositionY = cropY;
+                initPositionW = cropW;
+                initPositionH = cropH;
+            }, true);
+
+            topRightHandle.addEventListener('pointerdown', function (e) {
+
+                if (pointerCount !== 0) {
+                    return;
+                }
+                ++pointerCount;
+                resizingTR = true;
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                initPointerX = e.x;
+                initPointerY = e.y;
+                initPositionX = cropX;
+                initPositionY = cropY;
+                initPositionW = cropW;
+                initPositionH = cropH;
+            }, true);
+
+            bottomLeftHandle.addEventListener('pointerdown', function (e) {
+
+                if (pointerCount !== 0) {
+                    return;
+                }
+                ++pointerCount;
+                resizingBL = true;
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                initPointerX = e.x;
+                initPointerY = e.y;
+                initPositionX = cropX;
+                initPositionY = cropY;
+                initPositionW = cropW;
+                initPositionH = cropH;
+            }, true);
+
+            bottomRightHandle.addEventListener('pointerdown', function (e) {
+
+                if (pointerCount !== 0) {
+                    return;
+                }
+                ++pointerCount;
+                resizingBR = true;
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                initPointerX = e.x;
+                initPointerY = e.y;
+                initPositionX = cropX;
+                initPositionY = cropY;
+                initPositionW = cropW;
+                initPositionH = cropH;
+            }, true);
+
+            croppingContainer.addEventListener('pointerup', function (e) {
+
+                if (pointerCount !== 1) {
+                    return;
+                }
+                --pointerCount;
+                panning = false;
+                resizingTL = false;
+                resizingTR = false;
+                resizingBL = false;
+                resizingBR = false;
+
+                e.stopPropagation();
+            }, true);
+
+            croppingContainer.addEventListener('pointercancel', function (e) {
+
+                if (pointerCount !== 1) {
+                    return;
+                }
+                --pointerCount;
+                panning = false;
+                resizingTL = false;
+                resizingTR = false;
+                resizingBL = false;
+                resizingBR = false;
+
+                e.stopPropagation();
+            }, true);
+
+            croppingContainer.addEventListener('pointermove', function (e) {
+
+                if (pointerCount !== 1) {
+                    return;
+                }
+
+                e.stopPropagation();
+
+                var x = initPointerX - e.x;
+                var y = initPointerY - e.y;
+
+                if (panning === true) {
+                    cropX = initPositionX - Math.round(x / ratio);
+                    cropY = initPositionY - Math.round(y / ratio);
+                }
+                if (resizingTL === true) {
+                    cropX = initPositionX - Math.round(x / ratio);
+                    cropY = initPositionY - Math.round(y / ratio);
+                    cropW = initPositionW + Math.round(x / ratio);
+                    cropH = initPositionH + Math.round(y / ratio);
+                }
+                if (resizingTR === true) {
+                    cropY = initPositionY - Math.round(y / ratio);
+                    cropW = initPositionW - Math.round(x / ratio);
+                    cropH = initPositionH + Math.round(y / ratio);
+                }
+                if (resizingBL === true) {
+                    cropX = initPositionX - Math.round(x / ratio);
+                    cropW = initPositionW + Math.round(x / ratio);
+                    cropH = initPositionH - Math.round(y / ratio);
+                }
+                if (resizingBR === true) {
+                    cropW = initPositionW - Math.round(x / ratio);
+                    cropH = initPositionH - Math.round(y / ratio);
+                }
+
+                for (var i = 0; i < 2; i++) {
+                    if (cropX < 0) {
+                        cropX = 0;
+                    } else if (cropX + cropW > imgW) {
+                        cropX = imgW - cropW;
+                    }
+                    if (cropY < 0) {
+                        cropY = 0;
+                    } else if (cropY + cropH > imgH) {
+                        cropY = imgH - cropH;
+                    }
+                    if (cropW < 40) {
+                        cropW = 40;
+                    } else if (cropW > imgW - cropX) {
+                        cropW = imgW - cropX;
+                    }
+                    if (cropH < 40) {
+                        cropH = 40;
+                    } else if (cropH > imgH - cropY) {
+                        cropH = imgH - cropY;
+                    }
+                }
+
+                update();
+            }, true);
+        };//<--init()
+
+        var update = function () {
+
+            var pX = Math.round(cropX * ratio);
+            var pY = Math.round(cropY * ratio);
+            var pW = Math.round(cropW * ratio);
+            var pH = Math.round(cropH * ratio);
+
+            if (imgAR > viewAR) {
+                pY += Math.round(viewH / 2 - (imgH * ratio) / 2);
+            } else {
+                pX += Math.round(viewW / 2 - (imgW * ratio) / 2);
+            }
+
+            topLeftHandle.style.left = pX + 'px';
+            topLeftHandle.style.top = pY + 'px';
+            topRightHandle.style.left = pX + pW + 'px';
+            topRightHandle.style.top = pY + 'px';
+            bottomLeftHandle.style.left = pX + 'px';
+            bottomLeftHandle.style.top = pY + pH + 'px';
+            bottomRightHandle.style.left = pX + pW + 'px';
+            bottomRightHandle.style.top = pY + pH + 'px';
+
+            canvas.style.left = pX + 'px';
+            canvas.style.top = pY + 'px';
+            canvas.width = pW;
+            canvas.height = pH;
+            try {
+                context.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, pW, pH);
+            } catch (e) {
+                console.error(e);
+            }
+        };//<--update()
+
+        var back = function () {
+
+            croppingContainer.remove();
+
+            cropAppBar.remove();
+            app.view.appBar.insertTo(app.view.body);
+            app.status.croppable = true;
+            app.status.uploadable = true;
+        };
+
+        var cropAppBar = flagrate.createElement('div', { id: 'app-bar' }).insertTo(app.view.body);
+        new WinJS.UI.AppBar(
+            cropAppBar,
+            {
+                commands: [
+                    new WinJS.UI.AppBarCommand(flagrate.createElement('button'), {
+                        section: 'global',
+                        icon: 'accept',
+                        label: 'OK',
+                        onclick: function () {
+
+                            var filename = app.data.uploadFile.name;
+
+                            var temporaryFolder = Windows.Storage.ApplicationData.current.temporaryFolder;
+                            temporaryFolder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting)
+                                .then(function (file) {
+
+                                    if (!file) {
+                                        return;
+                                    }
+
+                                    file.openAsync(Windows.Storage.FileAccessMode.readWrite).then(function (output) {
+
+                                        // Get the IInputStream stream from the blob object of canvas
+                                        var input = canvas.msToBlob().msDetachStream();
+
+                                        // Copy the stream from the blob to the File stream 
+                                        Windows.Storage.Streams.RandomAccessStream.copyAsync(input, output).then(function () {
+
+                                            output.flushAsync().done(function () {
+
+                                                input.close();
+                                                output.close();
+
+                                                temporaryFolder.getFileAsync(filename).then(function (file) {
+
+                                                    URL.revokeObjectURL(app.data.uploadFileObjectURL);
+                                                    app.f.prepare(file);
+                                                    back();
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            //<--temporaryFolder.createFileAsync()
+                            // todo
+                        }
+                    }),
+                    new WinJS.UI.AppBarCommand(flagrate.createElement('button'), {
+                        section: 'global',
+                        icon: 'cancel',
+                        label: _L('cancel'),
+                        onclick: function () {
+
+                            back();
+                        }
+                    })
+                ],
+                sticky: true
+            }
+        ).show();
+    };//<--app.f.cropping()
 
     app.f.upload = function () {
 

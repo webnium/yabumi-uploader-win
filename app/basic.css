@@ -56,7 +56,7 @@ div#app-bar {
 }
 
 body.upload > div#app-bar {
-    background: rgba(0,0,0,0.95);
+    background: rgba(0,0,0,0.9);
 }
 
 body.viewer > div#app-bar {
@@ -118,9 +118,34 @@ div#preview {
         line-height: 30px;
     }
 
-canvas {
-    display: none;
-}
+    div#preview > div.cropping-container {
+        z-index: 1;
+        background-color: rgba(0,0,0,0.7);
+    }
+
+        div#preview > div.cropping-container > canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: move;
+        }
+
+        div#preview > div.cropping-container > div.cropping-handle {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            margin-top: -14px;
+            margin-left: -14px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #000;
+            background-color: #fff;
+            box-sizing: border-box;
+            cursor: move;
+        }
+
+        div#preview > div.cropping-container > div.cropping-handle:hover {
+            background-color: #d7d7d7;
+        }
 
 div.image-container {
     position: absolute;
