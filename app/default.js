@@ -461,6 +461,12 @@
                 }
 
                 image._div.title = (image.name || image.id) + ' (' + image.type + ', ' + size + sizeSuffix + ')';
+
+                if (image.expiresAt) {
+                    flagrate.createElement('div', { 'class': 'expires' })
+                        .insertText(_L('expiration') + ': ' + new Date(image.expiresAt).toLocaleString())
+                        .insertTo(image._div);
+                }
             }
 
             // get thumbnail if display range

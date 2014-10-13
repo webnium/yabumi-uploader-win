@@ -216,7 +216,7 @@ div.info-container {
 div.info-container.visible {
     padding: 10px 15px;
     height: 260px;
-    overflow: auto;
+    overflow: hidden;
     opacity: 1;
     -ms-user-select: text;
 }
@@ -316,6 +316,11 @@ div#images-container {
             display: inline-block;
             background-color: #eaeaea;
             margin-left: 10px;
+            overflow: hidden;
+        }
+
+        div#images-container > div > div:hover {
+            overflow: visible;
         }
 
         div#images-container > div > div:first-child {
@@ -367,40 +372,36 @@ div#images-container {
                 padding: 20px;
             }
 
-            div#images-container > div > div > div {
+            div#images-container > div > div > div.expires {
+                z-index: 1;
                 position: absolute;
+                top: 0;
                 right: 0;
-                bottom: 0;
-                left: 0;
                 overflow: hidden;
-                color: #fff;
-                text-shadow: 0 1px #000;
-                padding: 5px;
-                background-color: rgba(0, 0, 0, 0);
-                line-height: 1em;
+                color: #e6b422;
+                background-color: transparent;
+                width: 0;
+                height: 0;
+                border: 15px solid transparent;
+                border-top-color: #fcc800;
+                border-right-color: #fcc800;
+                opacity: 0.8;
             }
 
-            div#images-container > div > div:hover > div {
-                background-color: rgba(0, 0, 0, 0.65);
+            div#images-container > div > div:hover > div.expires {
+                border:none;
+                width: auto;
+                height: auto;
+                line-height: 16px;
+                padding: 5px 10px;
+                left: 0;
+                color: #111;
+                text-align: right;
+                font-size: 11px;
+                font-weight: bold;
+                background-color: #fcc800;
+                transition: all 0.25s ease;
             }
-
-                div#images-container > div > div > div > * {
-                    opacity: 0;
-                }
-
-                div#images-container > div > div:hover > div > * {
-                    opacity: 1;
-                }
-
-                div#images-container > div > div > div > h5 {
-                    margin: 0;
-                    font-size: 12px;
-                    line-height: 1.5em;
-                }
-
-                div#images-container > div > div > div > small {
-                    font-size: 10px;
-                }
 
 .win-flyout {
     max-width: 640px;
@@ -425,6 +426,10 @@ div#images-container {
         color: #fff;
         background-color: #e04040;
         border-color: #e04040;
+    }
+
+    .win-flyout h3 {
+        margin-bottom: 20px;
     }
 
 div.win-settingsflyout {

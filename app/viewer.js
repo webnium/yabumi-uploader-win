@@ -739,6 +739,11 @@
             app.view.expirationFlyout = null;
         });
 
+        flagrate.createElement('h3')
+            .insertText(_L('current settings') + ': ')
+            .insertText(app.image.expiresAt ? new Date(app.image.expiresAt).toLocaleString() : _L('never expires'))
+            .insertTo(app.view.expirationFlyout.element);
+
         var currentDate = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
         var datePicker = new WinJS.UI.DatePicker(flagrate.createElement().insertTo(app.view.expirationFlyout.element));
