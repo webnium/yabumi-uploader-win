@@ -577,6 +577,10 @@
                         label: 'OK',
                         onclick: function () {
 
+                            canvas.width = cropW;
+                            canvas.height = cropH;
+                            context.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
                             var filename = app.data.uploadFile.name;
 
                             var temporaryFolder = Windows.Storage.ApplicationData.current.temporaryFolder;
@@ -611,7 +615,6 @@
                                     });
                                 });
                             //<--temporaryFolder.createFileAsync()
-                            // todo
                         }
                     }),
                     new WinJS.UI.AppBarCommand(flagrate.createElement('button'), {
