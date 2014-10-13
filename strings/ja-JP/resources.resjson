@@ -43,7 +43,7 @@
     "default expiration": "デフォルトの有効期限",
     "sync": "同期",
     "history syncing": "履歴同期",
-    "advanced": "Advanced",
+    "advanced": "アドバンスド",
     "hours": "時間",
     "minutes": "分",
     "days": "日",
@@ -66,6 +66,6 @@
     "note-no-preview": "このイメージはプレビューすることができません",
     "note-ssl-secure": "通信は完全にSSLで暗号化されます",
     "note-delete-image": "本当にこのイメージを削除してもよろしいですか？",
-    "note-api-root": "These fields are intended for Yabumi Pro or Enterprise and other supported servers.",
+    "note-api-root": "これらの項目は Yabumi Pro や Enterprise 等の特別にサポートされたサーバーを利用する場合にのみ設定します",
     "note-api-root-https": "https://"
 }
