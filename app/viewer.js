@@ -22,6 +22,7 @@
             initialized: false,
             requesting: false,
             error: null,
+            adverseNetwork: false,
             clockOffsetTime: 0,
             zoom: 1
         },
@@ -299,8 +300,16 @@
             return;
         }
 
+        // get network condition
+        var connectionCost = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile().getConnectionCost();
+        if (connectionCost.roaming || connectionCost.approachingDataLimit || connectionCost.overDataLimit) {
+            app.status.adverseNetwork = true;
+        } else {
+            app.status.adverseNetwork = false;
+        }
+
         var imageUrl = '';
-        if (app.image.size >= 1048576 && /* todo */false) {
+        if (app.image.size >= 1024 * 256 && app.status.adverseNetwork === true) {
             imageUrl = app.f.getApiRoot(true) + 'images/' + app.image.id + '.jpg?v=' + app.image.__v + '&convert=medium';
         } else {
             imageUrl = app.f.getApiRoot(true) + 'images/' + app.image.id + '.' + app.image.extension + '?v=' + app.image.__v;
@@ -411,6 +420,16 @@
     };//<--app.f.updateInfo()
 
     app.f.getData = function (url, done) {
+
+        if (Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile() === null) {
+            new Windows.UI.Popups.MessageDialog(
+                _L('please connect to the internet'),
+                _L('error')
+            ).showAsync().then(function () {
+                app.f.back();
+            });
+            return;
+        }
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);

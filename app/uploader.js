@@ -698,6 +698,7 @@
 
                     // add to local history
                     localStorage.setItem(imageId, imagePin);
+                    localStorage.setItem('images.updated', '0');
 
                     // copy to clipboard
                     if (roamingSettings.values['config.copyURLToClipboard']) {

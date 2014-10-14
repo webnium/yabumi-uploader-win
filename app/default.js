@@ -14,7 +14,8 @@
         status: {
             loading: false,
             showingSettings: false,
-            //gettingImages: [],
+            adverseNetwork: false,
+            offline: false,
             imagesContainerWidth: 600
         },
         images: [],
@@ -86,6 +87,8 @@
                         label: _L('reload'),
                         tooltip: _L('reload') + ' (Ctrl+R)',
                         onclick: function () {
+                            localStorage.setItem('images.updated', '0');
+                            localStorage.setItem('history.updated', '0');
                             app.f.main();
                         }
                     }),
@@ -171,7 +174,9 @@
         // CTRL + r:82 -> Reload
         if (e.ctrlKey && e.keyCode === 82) {
             activated = true;
-            window.location.href = '/default.html';
+            localStorage.setItem('images.updated', '0');
+            localStorage.setItem('history.updated', '0');
+            app.f.main();
         }
 
         if (activated === true) {
@@ -187,14 +192,51 @@
 
         app.f.findImages();
 
-        if (roamingSettings.values['config.historyId']) {
-            var progress = flagrate.createElement('progress', { 'class': 'win-ring' }).insertTo(app.view.imagesContainer);
-            
+        // get network condition
+        if (Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile() === null) {
+            app.status.offline = true;
+        } else {
+            var connectionCost = Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile().getConnectionCost();
+            if (connectionCost.roaming || connectionCost.approachingDataLimit || connectionCost.overDataLimit) {
+                app.status.adverseNetwork = true;
+            } else {
+                app.status.adverseNetwork = false;
+            }
+        }
+
+        var viewImages = function () {
+
+            if (app.images.length !== 0) {
+                if (sessionStorage.getItem('default.scrollTop')) {
+                    var scrollTop = parseInt(sessionStorage.getItem('default.scrollTop'), 10);
+                    app.view.imagesContainer.style.height = (scrollTop + 800) + 'px';
+                    document.body.scrollTop = scrollTop;
+                    app.f.viewImages();
+                    app.view.imagesContainer.style.height = 'auto';
+                } else {
+                    app.f.viewImages();
+                }
+            }
+        };
+
+        var progress = flagrate.createElement('progress', { 'class': 'win-ring' }).insertTo(app.view.imagesContainer);
+
+        var syncHistory = false;
+        if (app.status.offline === false && roamingSettings.values['config.historyId']) {
+            syncHistory = true;
+            if (localStorage.getItem('history.updated') && parseInt(localStorage.getItem('history.updated'), 10) > Date.now() - 60000) {
+                syncHistory = false;
+            }
+        }
+
+        if (syncHistory === true) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', app.f.getApiRoot(true) + 'histories/' + roamingSettings.values['config.historyId'] + '.json');
             xhr.addEventListener('load', function () {
 
                 if (xhr.status === 200) {
+                    localStorage.setItem('history.updated', Date.now().toString(10));
+
                     app.history = JSON.parse(xhr.responseText);
 
                     var i, j, l, m, found, outdated;
@@ -233,20 +275,14 @@
                     }
 
                     app.f.findImages();
+
                     if (app.images.length !== 0) {
                         app.f.getImages(function () {
+
                             progress.remove();
                             app.status.loading = false;
 
-                            if (sessionStorage.getItem('default.scrollTop')) {
-                                var scrollTop = parseInt(sessionStorage.getItem('default.scrollTop'), 10);
-                                app.view.imagesContainer.style.height = (scrollTop + 800) + 'px';
-                                document.body.scrollTop = scrollTop;
-                                app.f.viewImages();
-                                app.view.imagesContainer.style.height = 'auto';
-                            } else {
-                                app.f.viewImages();
-                            }
+                            viewImages();
                         });
                     } else {
                         progress.remove();
@@ -261,16 +297,8 @@
 
                         progress.remove();
                         app.status.loading = false;
-                        
-                        if (sessionStorage.getItem('default.scrollTop')) {
-                            var scrollTop = parseInt(sessionStorage.getItem('default.scrollTop'), 10);
-                            app.view.imagesContainer.style.height = (scrollTop + 800) + 'px';
-                            document.body.scrollTop = scrollTop;
-                            app.f.viewImages();
-                            app.view.imagesContainer.style.height = 'auto';
-                        } else {
-                            app.f.viewImages();
-                        }
+
+                        viewImages();
                     });
                 }
             });
@@ -279,21 +307,16 @@
             if (app.images.length !== 0) {
                 app.f.getImages(function () {
 
+                    progress.remove();
                     app.status.loading = false;
-                    
-                    if (sessionStorage.getItem('default.scrollTop')) {
-                        var scrollTop = parseInt(sessionStorage.getItem('default.scrollTop'), 10);
-                        app.view.imagesContainer.style.height = (scrollTop + 800) + 'px';
-                        document.body.scrollTop = scrollTop;
-                        app.f.viewImages();
-                        app.view.imagesContainer.style.height = 'auto';
-                    } else {
-                        app.f.viewImages();
-                    }
+
+                    viewImages();
                 });
+            } else {
+                progress.remove();
             }
         }
-    };
+    };//<--app.f.main()
 
     app.f.findImages = function () {
 
@@ -349,12 +372,22 @@
         } else {
             var url = app.f.getApiRoot(true) + 'images/' + image.id + '.';
 
-            if (image.extension === 'gif' && image.size > 1024 * 1024) {
-                url += 'jpg?v=' + image.__v + '&convert=low';
-            } else if (image.extension !== 'gif' && (image.width + image.height > 2000 || image.size > 1024 * 400)) {
-                url += 'jpg?v=' + image.__v + '&convert=low';
+            if (app.status.adverseNetwork === true) {
+                if (image.extension === 'gif' && image.size > 1024 * 256) {
+                    url += 'jpg?v=' + image.__v + '&convert=low';
+                } else if (image.extension !== 'gif' && image.size > 1024 * 128) {
+                    url += 'jpg?v=' + image.__v + '&convert=low';
+                } else {
+                    url += image.extension + '?v=' + image.__v;
+                }
             } else {
-                url += image.extension + '?v=' + image.__v;
+                if (image.extension === 'gif' && image.size > 1024 * 1024) {
+                    url += 'jpg?v=' + image.__v + '&convert=medium';
+                } else if (image.extension !== 'gif' && (image.width + image.height > 2000 || image.size > 1024 * 400)) {
+                    url += 'jpg?v=' + image.__v + '&convert=medium';
+                } else {
+                    url += image.extension + '?v=' + image.__v;
+                }
             }
 
             var xhr = new XMLHttpRequest();
@@ -529,11 +562,35 @@
 
     app.f.getImages = function (done) {
 
+        if (app.status.offline === true) {
+            if (localStorage.getItem('images')) {
+                app.images = JSON.parse(localStorage.getItem('images'));
+                done();
+            } else {
+                new Windows.UI.Popups.MessageDialog(
+                    _L('please connect to the internet'),
+                    _L('error')
+                ).showAsync();
+            }
+            return;
+        }
+
+        if (localStorage.getItem('images') && localStorage.getItem('images.updated')) {
+            if (parseInt(localStorage.getItem('images.updated'), 10) > Date.now() - 60000) {
+                app.images = JSON.parse(localStorage.getItem('images'));
+                done();
+                return;
+            }
+        }
+
         var xhr = new XMLHttpRequest();
 
         xhr.addEventListener('load', function () {
 
             if (xhr.status === 200) {
+                localStorage.setItem('images', xhr.responseText);
+                localStorage.setItem('images.updated', Date.now().toString(10));
+
                 var images = JSON.parse(xhr.responseText);
 
                 app.images.forEach(function (image) {
@@ -570,7 +627,7 @@
 
         xhr.open('POST', app.f.getApiRoot(true) + 'images.json');
         xhr.send('_method=get&id=' + ids.join('%2B'));
-    };
+    };//<--app.f.getImages()
 
     app.f.saveHistory = function () {
 
