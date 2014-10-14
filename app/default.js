@@ -136,6 +136,14 @@
 
         var activated = false;
 
+        // ENTER:13 -> Select First Image
+        if (e.keyCode === 13 && active !== 'BUTTON') {
+            activated = true;
+            if (app.images[0] && app.images[0].id) {
+                window.location.href = '/viewer.html?' + app.images[0].id + '#history';
+            }
+        }
+
         // c:67 -> Upload from Camera
         if (e.keyCode === 67) {
             activated = true;
