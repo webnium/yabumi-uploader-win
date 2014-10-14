@@ -656,7 +656,7 @@
         // process
         var imagesUri = new Windows.Foundation.Uri(app.f.getApiRoot() + 'images.txt');
         var uploader = new BackgroundTransfer.BackgroundUploader();
-        uploader.setRequestHeader('user-agent', 'YabumiUploaderForWindows/' + versionString);
+        uploader.setRequestHeader('user-agent', 'YabumiForWindows/' + versionString + ' ' + navigator.userAgent);
         
         var parts = [], part;
         part = new BackgroundTransfer.BackgroundTransferContentPart('imagedata', encodeURI(app.data.uploadFile.name));

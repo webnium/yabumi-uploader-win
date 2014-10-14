@@ -12,7 +12,7 @@
 
         var yabumiSection = flagrate.createElement('div', { 'class': 'win-settings-section' }).insertTo(container);
 
-        flagrate.createElement('h3').insertText('Yabumi Uploader for Windows').insertTo(yabumiSection);
+        flagrate.createElement('h3').insertText('Yabumi for Windows').insertTo(yabumiSection);
         flagrate.createElement('p').insertText('Version ' + versionString).insertTo(yabumiSection);
         flagrate.createElement('p').insertText('Copyright © 2014 Webnium Inc.').insertTo(yabumiSection);
         flagrate.createElement('p').insertText('Licensed under the MIT License. (except identity assets)').insertTo(yabumiSection);
