@@ -309,7 +309,7 @@
         }
 
         var imageUrl = '';
-        if (app.image.size >= 1024 * 256 && app.status.adverseNetwork === true) {
+        if (app.status.adverseNetwork === true && app.image.size >= 1024 * 256 && app.image.extension !== 'pdf') {
             imageUrl = app.f.getApiRoot(true) + 'images/' + app.image.id + '.jpg?v=' + app.image.__v + '&convert=medium';
         } else {
             imageUrl = app.f.getApiRoot(true) + 'images/' + app.image.id + '.' + app.image.extension + '?v=' + app.image.__v;
