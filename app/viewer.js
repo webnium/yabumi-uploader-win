@@ -852,6 +852,7 @@
                 return;
             }
 
+            localStorage.setItem('images.updated', '0');
             app.f.updateInfo();
         });
         xhr.open('PUT', app.f.getApiRoot() + 'images/' + app.image.id + '.json');
@@ -1019,6 +1020,7 @@
 
             new Windows.UI.Popups.MessageDialog(_L('deleted successfully')).showAsync().done(function () {
                 localStorage.removeItem(app.image.id);
+                localStorage.setItem('images.updated', '0');
                 app.f.back();
             });
         });
