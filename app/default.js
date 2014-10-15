@@ -365,7 +365,7 @@
     app.f.getThumbnail = function (image) {
 
         if (image.extension === 'pdf') {
-            var img = flagrate.createElement('img', {
+            flagrate.createElement('img', {
                 src: '/images/thumbnail-pdf.svg',
                 'class': 'visible pdf'
             }).insertTo(image._div);
@@ -408,7 +408,7 @@
                 } else {
                     progress.remove();
 
-                    var img = flagrate.createElement('img', {
+                    flagrate.createElement('img', {
                         src: URL.createObjectURL(xhr.response, { oneTimeOnly: true }),
                         onload: 'this.className = "visible"'
                     }).insertTo(image._div);
@@ -433,8 +433,6 @@
 
         var lines = [];
         var line = null;
-
-        app.view.imagesContainer.update();
 
         var i, l, j, m, image, size, sizeSuffix;
 

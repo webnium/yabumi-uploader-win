@@ -385,7 +385,7 @@ div#images-container {
                 border: 15px solid transparent;
                 border-top-color: #fcc800;
                 border-right-color: #fcc800;
-                opacity: 0.8;
+                opacity: 0.9;
             }
 
             div#images-container > div > div:hover > div.expires {
