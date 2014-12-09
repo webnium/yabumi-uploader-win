@@ -369,6 +369,11 @@
                 src: '/images/thumbnail-pdf.svg',
                 'class': 'visible pdf'
             }).insertTo(image._div);
+        } else if (image.extension === 'psd') {
+            flagrate.createElement('img', {
+                src: '/images/thumbnail-psd.svg',
+                'class': 'visible psd'
+            }).insertTo(image._div);
         } else {
             var url = app.f.getApiRoot(true) + 'images/' + image.id + '.';
 

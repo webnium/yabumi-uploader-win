@@ -366,8 +366,9 @@ div#images-container {
             div#images-container > div > div > img.visible {
                 opacity: 1;
             }
-
-            div#images-container > div > div > img.pdf {
+            
+            div#images-container > div > div > img.pdf,
+            div#images-container > div > div > img.psd {
                 opacity: 1;
                 padding: 20px;
             }

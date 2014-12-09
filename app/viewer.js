@@ -318,6 +318,8 @@
         if (app.image.type === 'application/pdf') {
             app.f.getPdf(imageUrl);
             flagrate.Element.addClassName(app.view.body, 'pdf');
+        } else if (app.image.type === 'image/x-photoshop') {
+            app.f.getPsd(imageUrl);
         } else {
             app.f.getImage(imageUrl);
         }
@@ -419,7 +421,11 @@
         });
     };//<--app.f.updateInfo()
 
-    app.f.getData = function (url, done) {
+    app.f.getData = function (url, done, responseType) {
+
+        if (!responseType) {
+            responseType = 'blob';
+        }
 
         if (Windows.Networking.Connectivity.NetworkInformation.getInternetConnectionProfile() === null) {
             new Windows.UI.Popups.MessageDialog(
@@ -433,7 +439,7 @@
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
-        xhr.responseType = 'blob';
+        xhr.responseType = responseType;
 
         app.view.progress.insertTo(app.view.imageContainer);
         app.view.progress.max = app.image.size;
@@ -566,6 +572,49 @@
             }
         });
     };//<--app.f.getPdf()
+
+    app.f.getPsd = function (psdUrl) {
+
+        app.f.getData(psdUrl, function () {
+
+            setTimeout(function () {
+                app.f.parsePsd(app.data.image);
+            }, 200);
+        }, 'arraybuffer');
+    };//<--app.f.getPsd()
+
+    app.f.parsePsd = function (arrayBuffer) {
+
+        var psd = new PSD(new Uint8Array(arrayBuffer));
+        psd.parse();
+
+        if (app.view.image) {
+            app.view.image.remove();
+        }
+
+        var tree = psd.tree();
+
+        var width = app.image.width = tree.width;
+        var height = app.image.height = tree.height;
+
+        psd.image.toPng().then(function (img) {
+
+            app.view.image = flagrate.createElement('img', { src: img.src });
+            app.view.image.className = 'image';
+
+            app.view.image.style.maxWidth = width + 'px';
+            app.view.image.style.maxHeight = height + 'px';
+
+            app.view.image.insertTo(app.view.imageContainer);
+
+            app.f.setImage();
+
+            app.view.infoForm.splice(-1, 0, {
+                label: _L('dimensions'),
+                text: app.image.width + '×' + app.image.height + 'px'
+            });
+        });
+    };//<--app.f.parsePsd()
 
     app.f.setImage = function () {
 

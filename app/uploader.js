@@ -190,7 +190,7 @@
         openPicker.viewMode = Windows.Storage.Pickers.PickerViewMode.thumbnail;
         openPicker.suggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.picturesLibrary;
 
-        openPicker.fileTypeFilter.replaceAll(['.png', '.jpg', '.jpeg', '.gif', '.svg', '.pdf']);
+        openPicker.fileTypeFilter.replaceAll(['.png', '.jpg', '.jpeg', '.gif', '.svg', '.pdf', '.psd']);
 
         openPicker.pickSingleFileAsync().then(function (file) {
 

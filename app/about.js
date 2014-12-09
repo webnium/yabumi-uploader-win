@@ -30,6 +30,10 @@
         flagrate.createElement('h3').insertText('PDF.js (included)').insertTo(librarySection);
         flagrate.createElement('p').insertText('Copyright 2012 Mozilla Foundation').insertTo(librarySection);
         flagrate.createElement('p').insertText('Licensed under the Apache License, Version 2.0.').insertTo(librarySection);
+
+        flagrate.createElement('h3').insertText('PSD.js (included)').insertTo(librarySection);
+        flagrate.createElement('p').insertText('Copyright (c) 2014 Ryan LeFevre').insertTo(librarySection);
+        flagrate.createElement('p').insertText('Licensed under the MIT License.').insertTo(librarySection);
     };
 
     WinJS.UI.Pages.define("/about.html", {
